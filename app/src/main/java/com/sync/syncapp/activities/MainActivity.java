@@ -6,7 +6,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -30,13 +29,11 @@ import com.sync.syncapp.Constants;
 import com.sync.syncapp.fragments.DashboardFragment;
 import com.sync.syncapp.R;
 import com.sync.syncapp.fragments.SettingsFragment;
-import com.sync.syncapp.util.UserHandler;
+import com.sync.syncapp.util.AccountHandler;
 
 import static com.auth0.lock.Lock.AUTHENTICATION_ACTION;
 
-public class MainActivity extends AppCompatActivity
-        implements DashboardFragment.OnFragmentInteractionListener,
-        SettingsFragment.OnFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity {
 
     private String drawer[] = {"Dashboard", "Settings"};
 
@@ -48,7 +45,7 @@ public class MainActivity extends AppCompatActivity
     private CharSequence title;
     private CharSequence drawerTitle;
 
-    UserHandler userHandler;
+    AccountHandler accountHandler;
 
     LocalBroadcastManager broadcastManager;
     private BroadcastReceiver authenticationReceiver = new BroadcastReceiver() {
@@ -57,7 +54,7 @@ public class MainActivity extends AppCompatActivity
             UserProfile profile = intent.getParcelableExtra(Lock.AUTHENTICATION_ACTION_PROFILE_PARAMETER);
             String userId = profile.getId();
 
-            userHandler.setUserId(userId);
+            accountHandler.setUserId(userId);
 
             Log.i(Constants.TAG, "User is successfully logged in, id: " + userId);
 
@@ -72,7 +69,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        userHandler = UserHandler.newInstance(getApplicationContext());
+        accountHandler = AccountHandler.newInstance(getApplicationContext());
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerList = (ListView) findViewById(R.id.left_drawer);
@@ -122,7 +119,7 @@ public class MainActivity extends AppCompatActivity
     private boolean isFirstRun() {
         boolean firstRun = false;
 
-        firstRun = userHandler.getUserId().equals("");
+        firstRun = accountHandler.getUserId().equals("");
 
         return firstRun;
     }
@@ -173,11 +170,6 @@ public class MainActivity extends AppCompatActivity
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onFragmentInteraction(Uri uri) {
-        return;
     }
 
     private class DrawerItemClickListener implements ListView.OnItemClickListener {

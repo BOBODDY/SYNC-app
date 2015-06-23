@@ -1,13 +1,10 @@
 package com.sync.syncapp.fragments;
 
-import android.app.Activity;
-import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.preference.PreferenceFragment;
 
 import com.sync.syncapp.R;
-import com.sync.syncapp.util.UserHandler;
 
 
 /**
@@ -23,7 +20,6 @@ public class SettingsFragment extends PreferenceFragment {
      *
      * @return A new instance of fragment SettingsFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static SettingsFragment newInstance() {
         return new SettingsFragment();
     }

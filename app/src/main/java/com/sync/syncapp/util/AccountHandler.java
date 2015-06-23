@@ -10,19 +10,19 @@ import com.sync.syncapp.Constants;
  *
  * Taking care of user operations
  */
-public class UserHandler {
+public class AccountHandler {
 
     private Context context;
 
     private String userId;
 
-    public static UserHandler newInstance(Context c) {
-        UserHandler handler = new UserHandler();
+    public static AccountHandler newInstance(Context c) {
+        AccountHandler handler = new AccountHandler();
         handler.setContext(c);
         return handler;
     }
 
-    public UserHandler() {}
+    public AccountHandler() {}
 
     public String getUserId() {
         String userId = context.getSharedPreferences(Constants.PREFS, 0).getString(Constants.USER_ID, "");

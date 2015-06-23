@@ -1,7 +1,5 @@
 package com.sync.syncapp.fragments;
 
-import android.app.Activity;
-import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.view.LayoutInflater;
@@ -10,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.sync.syncapp.R;
-import com.sync.syncapp.util.UserHandler;
+import com.sync.syncapp.util.AccountHandler;
 
 
 /**
@@ -22,7 +20,7 @@ public class DashboardFragment extends Fragment {
 
     private String userId;
 
-    UserHandler userHandler;
+    AccountHandler accountHandler;
 
     TextView welcomeText;
 
@@ -42,8 +40,8 @@ public class DashboardFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        userHandler = UserHandler.newInstance(getActivity().getApplicationContext());
-        userId = userHandler.getUserId();
+        accountHandler = AccountHandler.newInstance(getActivity().getApplicationContext());
+        userId = accountHandler.getUserId();
     }
 
     @Override
