@@ -1,6 +1,7 @@
 package com.sync.syncapp.activities;
 
 import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -16,11 +17,14 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.sync.syncapp.Constants;
-import com.sync.syncapp.DashboardFragment;
+import com.sync.syncapp.fragments.DashboardFragment;
 import com.sync.syncapp.R;
+import com.sync.syncapp.fragments.SettingsFragment;
 
 //very first comment
-public class MainActivity extends AppCompatActivity implements DashboardFragment.OnFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity
+        implements DashboardFragment.OnFragmentInteractionListener,
+        SettingsFragment.OnFragmentInteractionListener {
 
     private String drawer[] = {"Dashboard", "Settings"};
 
@@ -49,7 +53,6 @@ public class MainActivity extends AppCompatActivity implements DashboardFragment
         drawerToggle = new ActionBarDrawerToggle(
                 this,
                 drawerLayout,
-//                R.drawable.ic_drawer,
                 R.string.drawer_open,
                 R.string.drawer_close) {
 
@@ -74,6 +77,10 @@ public class MainActivity extends AppCompatActivity implements DashboardFragment
 
         // Set the drawer toggle as the DrawerListener
         drawerLayout.setDrawerListener(drawerToggle);
+
+        FragmentTransaction tx = getFragmentManager().beginTransaction();
+        tx.replace(R.id.content_frame, new DashboardFragment());
+        tx.commit();
     }
 
     /* Called whenever we call invalidateOptionsMenu() */
@@ -132,7 +139,7 @@ public class MainActivity extends AppCompatActivity implements DashboardFragment
             fragment = new DashboardFragment();
         } else if(position == 1) {
             //TODO: create a settings fragment
-//            fragment = new SettingsFragment();
+            fragment = new SettingsFragment();
         }
 
         if(fragment == null) {
