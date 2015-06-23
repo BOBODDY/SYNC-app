@@ -7,8 +7,10 @@ import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.sync.syncapp.R;
+import com.sync.syncapp.util.UserHandler;
 
 
 /**
@@ -20,32 +22,27 @@ import com.sync.syncapp.R;
  * create an instance of this fragment.
  */
 public class DashboardFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+//    private static final String ARG_USER_ID = "userId";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private String userId;
 
     private OnFragmentInteractionListener mListener;
+
+    UserHandler userHandler;
+
+    TextView welcomeText;
 
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
      * @return A new instance of fragment DashboardFragment.
      */
-    // TODO: Rename and change types and number of parameters
-    public static DashboardFragment newInstance(String param1, String param2) {
+    public static DashboardFragment newInstance() {
         DashboardFragment fragment = new DashboardFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
+//        Bundle args = new Bundle();
+//        args.putString(ARG_USER_ID, userId);
+//        fragment.setArguments(args);
         return fragment;
     }
 
@@ -56,10 +53,9 @@ public class DashboardFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+
+        userHandler = UserHandler.newInstance(getActivity().getApplicationContext());
+        userId = userHandler.getUserId();
     }
 
     @Override
@@ -67,6 +63,14 @@ public class DashboardFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_dashboard, container, false);
+    }
+
+    public void onStart() {
+        super.onStart();
+
+        //TODO: load the user's dashboard from the back end
+        welcomeText = (TextView) getActivity().findViewById(R.id.dashboard_fragment_welcome);
+        welcomeText.setText("Welcome, " + userId);
     }
 
     // TODO: Rename method, update argument and hook method into UI event

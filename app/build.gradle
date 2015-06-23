@@ -17,6 +17,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/NOTICE'
+    }
 }
 
 //repositories {
@@ -26,5 +30,8 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:22.2.0'
-//    compile 'com.github.PhilJay:MPAndroidChart:v2.1.0'
+    //    compile 'com.github.PhilJay:MPAndroidChart:v2.1.0'
+    compile 'com.google.android.gms:play-services:7.5.0'
+    compile 'com.auth0.android:lock:1.9.4'
+    compile 'com.auth0.android:lock-googleplus:1.0.0'
 }

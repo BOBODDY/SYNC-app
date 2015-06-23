@@ -2,9 +2,15 @@ package com.sync.syncapp.activities;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -15,13 +21,19 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import com.auth0.core.UserProfile;
+import com.auth0.lock.Lock;
+import com.auth0.lock.LockActivity;
 import com.sync.syncapp.Constants;
 import com.sync.syncapp.fragments.DashboardFragment;
 import com.sync.syncapp.R;
 import com.sync.syncapp.fragments.SettingsFragment;
+import com.sync.syncapp.util.UserHandler;
 
-//very first comment
+import static com.auth0.lock.Lock.AUTHENTICATION_ACTION;
+
 public class MainActivity extends AppCompatActivity
         implements DashboardFragment.OnFragmentInteractionListener,
         SettingsFragment.OnFragmentInteractionListener {
@@ -36,10 +48,31 @@ public class MainActivity extends AppCompatActivity
     private CharSequence title;
     private CharSequence drawerTitle;
 
+    UserHandler userHandler;
+
+    LocalBroadcastManager broadcastManager;
+    private BroadcastReceiver authenticationReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            UserProfile profile = intent.getParcelableExtra(Lock.AUTHENTICATION_ACTION_PROFILE_PARAMETER);
+            String userId = profile.getId();
+
+            userHandler.setUserId(userId);
+
+            Log.i(Constants.TAG, "User is successfully logged in, id: " + userId);
+
+            FragmentTransaction tx = getFragmentManager().beginTransaction();
+            tx.replace(R.id.content_frame, DashboardFragment.newInstance());
+            tx.commitAllowingStateLoss();
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        userHandler = UserHandler.newInstance(getApplicationContext());
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerList = (ListView) findViewById(R.id.left_drawer);
@@ -78,9 +111,20 @@ public class MainActivity extends AppCompatActivity
         // Set the drawer toggle as the DrawerListener
         drawerLayout.setDrawerListener(drawerToggle);
 
-        FragmentTransaction tx = getFragmentManager().beginTransaction();
-        tx.replace(R.id.content_frame, new DashboardFragment());
-        tx.commit();
+        broadcastManager = LocalBroadcastManager.getInstance(this);
+        broadcastManager.registerReceiver(authenticationReceiver, new IntentFilter(AUTHENTICATION_ACTION));
+
+//        FragmentTransaction tx = getFragmentManager().beginTransaction();
+//        tx.replace(R.id.content_frame, new DashboardFragment());
+//        tx.commit();
+    }
+
+    private boolean isFirstRun() {
+        boolean firstRun = false;
+
+        firstRun = userHandler.getUserId().equals("");
+
+        return firstRun;
     }
 
     /* Called whenever we call invalidateOptionsMenu() */
@@ -94,6 +138,19 @@ public class MainActivity extends AppCompatActivity
 
     protected void onStart() {
         super.onStart();
+
+        if(isFirstRun()) {
+            Context applicationContext = getApplicationContext();
+            Toast.makeText(applicationContext, "Not logged in yet", Toast.LENGTH_SHORT).show();
+            Intent lockIntent = new Intent(applicationContext, LockActivity.class);
+            startActivity(lockIntent);
+        } else {
+            String userId = getSharedPreferences(Constants.PREFS, 0).getString(Constants.USER_ID, "");
+
+            FragmentTransaction tx = getFragmentManager().beginTransaction();
+            tx.replace(R.id.content_frame, DashboardFragment.newInstance());
+            tx.commitAllowingStateLoss();
+        }
     }
 
     @Override

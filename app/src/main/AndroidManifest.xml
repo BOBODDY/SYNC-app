@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.sync.syncapp" >
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.sync.syncapp">
+
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:name=".SyncApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
 
         <activity
             android:name=".activities.MainActivity"
@@ -32,6 +36,23 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.sync.syncapp.activities.MainActivity" />
         </activity>
+
+        <!--Auth0 Lock-->
+        <activity
+            android:name="com.auth0.lock.LockActivity"
+            android:theme="@style/Lock.Theme"
+            android:screenOrientation="portrait"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="a0sutttilZfWs0l2Y2NAFq9fdj8AKdkzKZ" android:host="boboddy.auth0.com"/>
+            </intent-filter>
+        </activity>
+        <meta-data android:name="com.auth0.lock.client-id" android:value="sutttilZfWs0l2Y2NAFq9fdj8AKdkzKZ"/>
+        <meta-data android:name="com.auth0.lock.domain-url" android:value="boboddy.auth0.com"/>
+        <!--Auth0 Lock End-->
 
     </application>
 
