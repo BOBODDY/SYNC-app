@@ -1,4 +1,4 @@
-package com.sync.syncapp;
+package com.sync.syncapp.fragments;
 
 import android.app.Activity;
 import android.net.Uri;
@@ -7,6 +7,8 @@ import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.sync.syncapp.R;
 
 
 /**
