@@ -25,8 +25,7 @@ public class SettingsFragment extends PreferenceFragment {
      */
     // TODO: Rename and change types and number of parameters
     public static SettingsFragment newInstance() {
-        SettingsFragment fragment = new SettingsFragment();
-        return fragment;
+        return new SettingsFragment();
     }
 
     public SettingsFragment() {}

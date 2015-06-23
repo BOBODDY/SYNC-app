@@ -22,7 +22,6 @@ public class DashboardFragment extends Fragment {
 
     private String userId;
 
-
     UserHandler userHandler;
 
     TextView welcomeText;
@@ -34,8 +33,7 @@ public class DashboardFragment extends Fragment {
      * @return A new instance of fragment DashboardFragment.
      */
     public static DashboardFragment newInstance() {
-        DashboardFragment fragment = new DashboardFragment();
-        return fragment;
+        return new DashboardFragment();
     }
 
     public DashboardFragment() {}
