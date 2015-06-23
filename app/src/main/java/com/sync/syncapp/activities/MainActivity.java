@@ -54,7 +54,8 @@ public class MainActivity extends AppCompatActivity {
             UserProfile profile = intent.getParcelableExtra(Lock.AUTHENTICATION_ACTION_PROFILE_PARAMETER);
             String userId = profile.getId();
 
-            accountHandler.setUserId(userId);
+//            accountHandler.setUserId(userId);
+            accountHandler.addAccount(profile);
 
             Log.i(Constants.TAG, "User is successfully logged in, id: " + userId);
 
@@ -110,18 +111,10 @@ public class MainActivity extends AppCompatActivity {
 
         broadcastManager = LocalBroadcastManager.getInstance(this);
         broadcastManager.registerReceiver(authenticationReceiver, new IntentFilter(AUTHENTICATION_ACTION));
-
-//        FragmentTransaction tx = getFragmentManager().beginTransaction();
-//        tx.replace(R.id.content_frame, new DashboardFragment());
-//        tx.commit();
     }
 
     private boolean isFirstRun() {
-        boolean firstRun = false;
-
-        firstRun = accountHandler.getUserId().equals("");
-
-        return firstRun;
+        return accountHandler.getUserId().equals("");
     }
 
     /* Called whenever we call invalidateOptionsMenu() */

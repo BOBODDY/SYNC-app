@@ -58,6 +58,8 @@ public class DashboardFragment extends Fragment {
         //TODO: load the user's dashboard from the back end
         welcomeText = (TextView) getActivity().findViewById(R.id.dashboard_fragment_welcome);
         welcomeText.setText("Welcome, " + userId);
+
+
     }
 
 }
