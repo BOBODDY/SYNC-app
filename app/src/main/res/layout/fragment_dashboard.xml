@@ -3,10 +3,123 @@
     android:layout_height="match_parent" tools:context="com.sync.syncapp.fragments.DashboardFragment">
 
     <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:id="@+id/dashboard_fragment_welcome"
+    <!--<TextView-->
+        <!--android:id="@+id/dashboard_fragment_welcome"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:text="Dashboard!" />-->
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Dashboard!" />
+        android:layout_height="wrap_content">
+
+        <!-- Sleep duration -->
+        <TextView
+            android:id="@+id/dash_sleep_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_marginTop="20dp"
+            android:layout_centerHorizontal="true"
+            android:text="@string/dash_sleep_title"/>
+
+        <TextView
+            android:id="@+id/dash_sleep_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dash_sleep_default"
+            android:layout_below="@id/dash_sleep_title"
+            android:layout_marginTop="5dp"
+            android:layout_centerHorizontal="true"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textStyle="bold"/>
+
+        <!-- CO2 level -->
+        <TextView
+            android:id="@+id/dash_co2_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/dash_sleep_value"
+            android:layout_marginTop="20dp"
+            android:layout_centerHorizontal="true"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/dash_co2_title"/>
+
+        <TextView
+            android:id="@+id/dash_co2_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dash_co2_default"
+            android:layout_below="@id/dash_co2_title"
+            android:layout_marginTop="5dp"
+            android:layout_centerHorizontal="true"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textStyle="bold"/>
+
+        <!-- Temperature -->
+        <TextView
+            android:id="@+id/dash_temp_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dash_temp_title"
+            android:layout_below="@id/dash_co2_value"
+            android:layout_marginTop="20dp"
+            android:layout_centerHorizontal="true"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/dash_temp_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dash_temp_default"
+            android:layout_below="@id/dash_temp_title"
+            android:layout_marginTop="5dp"
+            android:layout_centerHorizontal="true"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textStyle="bold"/>
+
+        <!-- Light Intensity -->
+        <TextView
+            android:id="@+id/dash_light_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dash_light_title"
+            android:layout_below="@id/dash_temp_value"
+            android:layout_marginTop="20dp"
+            android:layout_centerHorizontal="true"
+            android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+        <TextView
+            android:id="@+id/dash_light_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="LIGHT"
+            android:layout_below="@id/dash_light_title"
+            android:layout_marginTop="5dp"
+            android:layout_centerHorizontal="true"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textStyle="bold"/>
+
+        <!-- Humidity -->
+        <TextView
+            android:id="@+id/dash_humidity_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dash_humidity_title"
+            android:layout_below="@id/dash_light_value"
+            android:layout_marginTop="20dp"
+            android:layout_centerHorizontal="true"
+            android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+        <TextView
+            android:id="@+id/dash_humidity_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dash_humidity_default"
+            android:layout_below="@id/dash_humidity_title"
+            android:layout_marginTop="5dp"
+            android:layout_centerHorizontal="true"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textStyle="bold"/>
+    </RelativeLayout>
 
 </FrameLayout>
