@@ -180,7 +180,6 @@ public class MainActivity extends AppCompatActivity {
         if(position == 0) {
             fragment = new DashboardFragment();
         } else if(position == 1) {
-            //TODO: create a settings fragment
             fragment = new SettingsFragment();
         }
 
