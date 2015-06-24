@@ -79,7 +79,7 @@ public class DashboardFragment extends Fragment {
                             Log.i(Constants.TAG, "Getting the dashboard works!");
                             //TODO: set data based on object received
                             //example:
-                            //result.get("sleep_duration");
+                            //sleepDuration.setText(result.get("sleep_duration"));
                         }
                     }
                 });

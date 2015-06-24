@@ -66,17 +66,15 @@ public class AccountHandler {
         String nickname = profile.getNickname();
         String picture = profile.getPictureURL();
 
-        /**
-         * {
-         "id": "string",
-         "user_id": "string",
-         "connection": "string",
-         "email": "string",
-         "provider": "string",
-         "nickname": "string",
-         "picture": "string"
-         }
-         */
+//        {
+//             "id": "string",
+//             "user_id": "string",
+//             "connection": "string",
+//             "email": "string",
+//             "provider": "string",
+//             "nickname": "string",
+//             "picture": "string"
+//         }
 
         JsonObject json = new JsonObject();
         json.addProperty("id", id);
