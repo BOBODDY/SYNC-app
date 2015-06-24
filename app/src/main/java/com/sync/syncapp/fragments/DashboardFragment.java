@@ -8,12 +8,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 import com.sync.syncapp.Constants;
 import com.sync.syncapp.R;
 import com.sync.syncapp.util.AccountHandler;
+
+import org.json.JSONArray;
+import org.w3c.dom.Text;
 
 
 /**
@@ -27,7 +31,7 @@ public class DashboardFragment extends Fragment {
 
     AccountHandler accountHandler;
 
-    TextView sleepDuration, co2Level, temperature, humidity;
+    TextView sleepDuration, co2Level, light, temperature, humidity;
 
     /**
      * Use this factory method to create a new instance of
@@ -48,10 +52,7 @@ public class DashboardFragment extends Fragment {
         accountHandler = AccountHandler.newInstance(getActivity().getApplicationContext());
         userId = accountHandler.getUserId();
 
-        sleepDuration = (TextView) getActivity().findViewById(R.id.dash_sleep_value);
-        co2Level = (TextView) getActivity().findViewById(R.id.dash_co2_value);
-        temperature = (TextView) getActivity().findViewById(R.id.dash_temp_value);
-        humidity = (TextView) getActivity().findViewById(R.id.dash_humidity_value);
+
     }
 
     @Override
@@ -65,21 +66,37 @@ public class DashboardFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
+        sleepDuration = (TextView) getActivity().findViewById(R.id.dash_sleep_value);
+        co2Level = (TextView) getActivity().findViewById(R.id.dash_co2_value);
+        temperature = (TextView) getActivity().findViewById(R.id.dash_temp_value);
+        humidity = (TextView) getActivity().findViewById(R.id.dash_humidity_value);
+        light = (TextView) getActivity().findViewById(R.id.dash_light_value);
+
         Ion.with(getActivity().getApplicationContext())
                 .load(Constants.API + "/api/Dashboard")
-                .asJsonObject()
-                .setCallback(new FutureCallback<JsonObject>() {
+                .asJsonArray()
+                .setCallback(new FutureCallback<JsonArray>() {
                     @Override
-                    public void onCompleted(Exception e, JsonObject result) {
-                        if(e != null) {
+                    public void onCompleted(Exception e, JsonArray result) {
+                        if (e != null) {
                             Log.e(Constants.TAG, "error loading dashboard:", e);
                             return;
                         }
-                        if(result != null) {
-                            Log.i(Constants.TAG, "Getting the dashboard works!");
+                        if (result != null) {
+                            Log.i(Constants.TAG, "Getting the dashboard works! result: " + result);
                             //TODO: set data based on object received
                             //example:
-                            //sleepDuration.setText(result.get("sleep_duration"));
+
+                            JsonObject object = result.get(0).getAsJsonObject();
+                            JsonObject summary = object.get("summary").getAsJsonObject();
+                            JsonObject esData = object.get("esdata").getAsJsonObject();
+
+                            sleepDuration.setText(summary.get("totalTimeInBed").getAsString());
+
+                            temperature.setText(esData.get("Temperature").getAsString() + " F");
+                            humidity.setText(esData.get("Humidity").getAsString() + "%");
+                            light.setText(esData.get("Luminance").getAsString() + " lux");
+                            co2Level.setText(esData.get("CO2Level").getAsString() + " ppm");
                         }
                     }
                 });

@@ -35,7 +35,7 @@ import static com.auth0.lock.Lock.AUTHENTICATION_ACTION;
 
 public class MainActivity extends AppCompatActivity {
 
-    private String drawer[] = {"Dashboard", "Settings"};
+    private String drawer[] = {"Dashboard", "Settings"}; //TODO: add a logout button
 
     private ActionBarDrawerToggle drawerToggle;
 
