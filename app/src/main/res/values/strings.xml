@@ -24,5 +24,5 @@
     <string name="room">Room:</string>
     <string name="add">Add</string>
 
-    <string name="title_activity_add_user">AddUserActivity</string>
+    <string name="title_activity_add_user">Add User</string>
 </resources>
