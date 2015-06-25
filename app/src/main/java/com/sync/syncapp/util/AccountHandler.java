@@ -104,4 +104,9 @@ public class AccountHandler {
                     }
                 });
     }
+
+    public void logout() {
+        SharedPreferences prefs = context.getSharedPreferences(Constants.PREFS, 0);
+        prefs.edit().putString(Constants.USER_ID, "").apply();
+    }
 }

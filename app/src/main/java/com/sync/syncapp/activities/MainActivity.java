@@ -4,6 +4,7 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
@@ -12,6 +13,7 @@ import android.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -59,9 +61,7 @@ public class MainActivity extends AppCompatActivity {
 
             Log.i(Constants.TAG, "User is successfully logged in, id: " + userId);
 
-            FragmentTransaction tx = getFragmentManager().beginTransaction();
-            tx.replace(R.id.content_frame, DashboardFragment.newInstance());
-            tx.commitAllowingStateLoss();
+            selectItem(0); // Assuming Dashboard is the first item
         }
     };
 
@@ -137,9 +137,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             String userId = getSharedPreferences(Constants.PREFS, 0).getString(Constants.USER_ID, "");
 
-            FragmentTransaction tx = getFragmentManager().beginTransaction();
-            tx.replace(R.id.content_frame, DashboardFragment.newInstance());
-            tx.commitAllowingStateLoss();
+            selectItem(0); // As long as the Dashboard is the first item
         }
     }
 
@@ -158,7 +156,24 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_logout) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Logout")
+                    .setMessage("Are you sure you want to logout?")
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // continue with delete
+                            accountHandler.logout();
+                            Toast.makeText(getApplicationContext(), "Logout Successful", Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(getApplicationContext(), LockActivity.class));
+                        }
+                    })
+                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // do nothing
+                        }
+                    })
+                    .show();
             return true;
         }
 
@@ -192,7 +207,7 @@ public class MainActivity extends AppCompatActivity {
         FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.beginTransaction()
                 .replace(R.id.content_frame, fragment)
-                .commit();
+                .commitAllowingStateLoss();
 
         // Highlight the selected item, update the title, and close the drawer
         drawerList.setItemChecked(position, true);
