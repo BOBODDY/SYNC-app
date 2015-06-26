@@ -28,6 +28,7 @@ import com.auth0.core.UserProfile;
 import com.auth0.lock.Lock;
 import com.auth0.lock.LockActivity;
 import com.sync.syncapp.Constants;
+import com.sync.syncapp.NavDrawer;
 import com.sync.syncapp.fragments.DashboardFragment;
 import com.sync.syncapp.R;
 import com.sync.syncapp.fragments.SettingsFragment;
@@ -43,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
     private DrawerLayout drawerLayout;
     private ListView drawerList;
+    private NavDrawer navDrawer;
 
     private CharSequence title;
     private CharSequence drawerTitle;
@@ -73,11 +75,12 @@ public class MainActivity extends AppCompatActivity {
         accountHandler = AccountHandler.newInstance(getApplicationContext());
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawerList = (ListView) findViewById(R.id.left_drawer);
 
-        // Set up the adapter for the listview
-        drawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, drawer));
-        drawerList.setOnItemClickListener(new DrawerItemClickListener());
+        navDrawer = (NavDrawer) findViewById(R.id.nav_drawer);
+        navDrawer.init();
+        //Set up the adapter for the ListView
+        navDrawer.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, drawer));
+        navDrawer.setOnItemClickListener(new DrawerItemClickListener());
 
         title = drawerTitle = getTitle();
 
@@ -180,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private class DrawerItemClickListener implements ListView.OnItemClickListener {
+    public class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView parent, View view, int position, long id) {
             selectItem(position);
