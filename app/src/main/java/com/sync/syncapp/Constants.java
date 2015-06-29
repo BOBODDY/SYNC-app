@@ -10,4 +10,5 @@ public class Constants {
     public static String API = "https://microsoft-apiapp5fbc47c1353a4be3adcddf010a183c28.azurewebsites.net";
     public static String PREFS = "SYNCapp.prefs";
     public static String USER_ID = "user_id";
+    public static String FIRST_RUN = "firstRun";
 }

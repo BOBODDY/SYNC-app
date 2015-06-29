@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -34,6 +36,7 @@ import com.sync.syncapp.fragments.SettingsFragment;
 import com.sync.syncapp.util.AccountHandler;
 
 import static com.auth0.lock.Lock.AUTHENTICATION_ACTION;
+import static com.auth0.lock.Lock.CANCEL_ACTION;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -59,9 +62,17 @@ public class MainActivity extends AppCompatActivity {
 //            accountHandler.setUserId(userId);
             accountHandler.addAccount(profile);
 
-            Log.i(Constants.TAG, "User is successfully logged in, id: " + userId);
+            Log.i(Constants.TAG, "User is successfully logged in, ~id: " + userId);
 
             selectItem(0); // Assuming Dashboard is the first item
+        }
+    };
+
+    private BroadcastReceiver cancelReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(Constants.TAG, "user canceled loggin in");
+            finish();
         }
     };
 
@@ -111,6 +122,8 @@ public class MainActivity extends AppCompatActivity {
 
         broadcastManager = LocalBroadcastManager.getInstance(this);
         broadcastManager.registerReceiver(authenticationReceiver, new IntentFilter(AUTHENTICATION_ACTION));
+        broadcastManager.registerReceiver(cancelReceiver, new IntentFilter(CANCEL_ACTION));
+
     }
 
     private boolean isFirstRun() {
