@@ -33,6 +33,6 @@ dependencies {
     //    compile 'com.github.PhilJay:MPAndroidChart:v2.1.0'
     compile 'com.google.android.gms:play-services:7.5.0'
     compile 'com.auth0.android:lock:1.9.4'
-    compile 'com.auth0.android:lock-googleplus:1.0.0'
+    compile 'com.auth0.android:lock-googleplus:2.0.0'
     compile 'com.koushikdutta.ion:ion:2.1.6'
 }
