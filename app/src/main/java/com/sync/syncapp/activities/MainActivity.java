@@ -155,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             String userId = getSharedPreferences(Constants.PREFS, 0).getString(Constants.USER_ID, "");
 
-            //selectItem(0); // As long as the Dashboard is the first item
+            selectItem(0); // As long as the Dashboard is the first item
         }
     }
 

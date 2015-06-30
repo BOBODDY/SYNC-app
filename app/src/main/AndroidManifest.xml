@@ -25,7 +25,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activities.AddUserActivity"
             android:label="@string/title_activity_add_user"
@@ -67,6 +66,16 @@
             android:value="boboddy.auth0.com" />
         <!-- Auth0 Lock End -->
 
+        <activity
+            android:name=".activities.AddRoomActivity"
+            android:label="@string/title_activity_add_room" >
+
+            <intent-filter>
+                <action android:name=".activities.AddRoomActivity" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
