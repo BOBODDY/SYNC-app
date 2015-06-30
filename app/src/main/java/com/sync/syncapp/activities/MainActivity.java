@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.ViewDragHelper;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -34,6 +35,8 @@ import com.sync.syncapp.fragments.DashboardFragment;
 import com.sync.syncapp.R;
 import com.sync.syncapp.fragments.SettingsFragment;
 import com.sync.syncapp.util.AccountHandler;
+
+import java.lang.reflect.Field;
 
 import static com.auth0.lock.Lock.AUTHENTICATION_ACTION;
 import static com.auth0.lock.Lock.CANCEL_ACTION;
@@ -124,6 +127,22 @@ public class MainActivity extends AppCompatActivity {
         broadcastManager.registerReceiver(authenticationReceiver, new IntentFilter(AUTHENTICATION_ACTION));
         broadcastManager.registerReceiver(cancelReceiver, new IntentFilter(CANCEL_ACTION));
 
+        try {
+            Field mDragger = drawerLayout.getClass().getDeclaredField("mLeftDragger");//mRightDragger for right obviously
+            mDragger.setAccessible(true);
+            ViewDragHelper draggerObj = (ViewDragHelper) mDragger.get(drawerLayout);
+
+            Field mEdgeSize = draggerObj.getClass().getDeclaredField("mEdgeSize");
+
+            mEdgeSize.setAccessible(true);
+            int edge = mEdgeSize.getInt(draggerObj);
+
+            mEdgeSize.setInt(draggerObj, edge * 5); //optimal value as for me, you may set any constant in dp
+        } catch(NoSuchFieldException nsfe) {
+            Log.e(Constants.TAG, "NoSuchFieldException: ", nsfe);
+        } catch(IllegalAccessException iae) {
+            Log.e(Constants.TAG, "IllegalAccessException: ", iae);
+        }
     }
 
     private boolean isFirstRun() {
@@ -207,6 +226,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /** Swaps fragments in the main content view */
+    //TODO: This is causing issues when logging out and logging back in again. Fix it.
     private void selectItem(int position) {
         Fragment fragment = null;
 
