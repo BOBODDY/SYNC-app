@@ -25,5 +25,8 @@
     <string name="room">Room:</string>
     <string name="add">Add</string>
 
+    <!-- Add Sensor strings -->
+    <string name="add_sensor">Add Sensor</string>
+
     <string name="title_activity_add_user">Add User</string>
 </resources>

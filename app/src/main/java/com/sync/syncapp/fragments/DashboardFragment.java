@@ -51,8 +51,6 @@ public class DashboardFragment extends Fragment {
 
         accountHandler = AccountHandler.newInstance(getActivity().getApplicationContext());
         userId = accountHandler.getUserId();
-
-
     }
 
     @Override

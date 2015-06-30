@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
     private BroadcastReceiver cancelReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d(Constants.TAG, "user canceled loggin in");
+            Log.d(Constants.TAG, "user canceled logging in");
             finish();
         }
     };
@@ -142,6 +142,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
+    }
+
+    protected void onPostResume() {
+        super.onPostResume();
+
         if(isFirstRun()) {
             Context applicationContext = getApplicationContext();
             Toast.makeText(applicationContext, "Not logged in yet", Toast.LENGTH_SHORT).show();
@@ -150,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             String userId = getSharedPreferences(Constants.PREFS, 0).getString(Constants.USER_ID, "");
 
-            selectItem(0); // As long as the Dashboard is the first item
+            //selectItem(0); // As long as the Dashboard is the first item
         }
     }
 
@@ -178,7 +183,8 @@ public class MainActivity extends AppCompatActivity {
                             // continue with delete
                             accountHandler.logout();
                             Toast.makeText(getApplicationContext(), "Logout Successful", Toast.LENGTH_SHORT).show();
-                            startActivity(new Intent(getApplicationContext(), LockActivity.class));
+                            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                            finish();
                         }
                     })
                     .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
