@@ -69,9 +69,18 @@
         <activity
             android:name=".activities.AddRoomActivity"
             android:label="@string/title_activity_add_room" >
-
             <intent-filter>
                 <action android:name=".activities.AddRoomActivity" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".activities.AddSensorActivity"
+            android:label="@string/title_activity_add_sensor" >
+
+            <intent-filter>
+                <action android:name=".activities.AddSensorActivity" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>

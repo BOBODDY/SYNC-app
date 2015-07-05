@@ -35,4 +35,5 @@
 
     <string name="title_activity_add_user">Add User</string>
     <string name="title_activity_add_room">Add Room</string>
+    <string name="title_activity_add_sensor">Add Sensor</string>
 </resources>

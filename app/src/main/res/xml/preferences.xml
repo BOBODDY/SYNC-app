@@ -5,9 +5,9 @@
         <intent android:action=".activities.AddUserActivity" />
     </Preference>
 
-    <!--<Preference android:title="@string/add_sensor">-->
-        <!--<intent android:action=".activities.AddSensorActivity" />-->
-    <!--</Preference>-->
+    <Preference android:title="@string/add_sensor">
+        <intent android:action=".activities.AddSensorActivity" />
+    </Preference>
 
     <Preference android:title="@string/add_room">
         <intent android:action=".activities.AddRoomActivity" />
