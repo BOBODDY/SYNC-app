@@ -7,6 +7,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
@@ -29,8 +30,8 @@ public class AddPersonActivity extends AppCompatActivity {
     TextView roomTitle;
     EditText personName;
     Spinner personRoom;
-
     ProgressBar loading;
+    Button done;
 
     AccountHandler theHandler; //https://www.youtube.com/watch?v=BF1DQr5dKW8
 
@@ -48,6 +49,37 @@ public class AddPersonActivity extends AppCompatActivity {
         personName = (EditText) findViewById(R.id.add_person_name);
 
         personRoom = (Spinner) findViewById(R.id.add_person_room);
+
+        done = (Button) findViewById(R.id.add_person_done);
+        done.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                JsonObject personJson = new JsonObject();
+
+                String userId = theHandler.getUserId();
+                personJson.addProperty("user_id", userId);
+                personJson.addProperty("account_id", userId);
+                personJson.addProperty("nickname", personName.getText().toString());
+
+                Ion.with(getApplicationContext())
+                        .load(Constants.API + "/api/Persons")
+                        .setJsonObjectBody(personJson)
+                        .asJsonObject()
+                        .setCallback(new FutureCallback<JsonObject>() {
+                            @Override
+                            public void onCompleted(Exception e, JsonObject result) {
+                                if(e != null) {
+                                    Log.e(Constants.TAG, "Error POSTing the new person", e);
+                                    return;
+                                }
+
+                                if(result != null) {
+                                    Log.d(Constants.TAG, "Successfully posted person");
+                                }
+                            }
+                        });
+            }
+        });
 
         theHandler = AccountHandler.newInstance(this);
         String userid = theHandler.getUserId();

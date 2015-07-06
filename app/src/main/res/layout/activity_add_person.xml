@@ -57,5 +57,12 @@
             android:layout_height="wrap_content" />
     </LinearLayout>
 
+    <Button
+        android:id="@+id/add_person_done"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/add"
+        android:layout_below="@id/add_person_room_layout"
+        android:layout_marginTop="25dp"/>
 
 </RelativeLayout>
