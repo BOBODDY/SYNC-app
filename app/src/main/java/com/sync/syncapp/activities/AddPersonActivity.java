@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -27,9 +28,7 @@ import org.json.JSONObject;
 public class AddPersonActivity extends AppCompatActivity {
 
     TextView nameTitle;
-    TextView roomTitle;
     EditText personName;
-    Spinner personRoom;
     ProgressBar loading;
     Button done;
 
@@ -41,25 +40,26 @@ public class AddPersonActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_person);
 
         loading = (ProgressBar) findViewById(R.id.add_person_loading);
+        loading.setVisibility(View.INVISIBLE);
 
         nameTitle = (TextView) findViewById(R.id.add_person_name_title);
 
-        roomTitle = (TextView) findViewById(R.id.add_person_room_title);
-
         personName = (EditText) findViewById(R.id.add_person_name);
-
-        personRoom = (Spinner) findViewById(R.id.add_person_room);
 
         done = (Button) findViewById(R.id.add_person_done);
         done.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                loading.setVisibility(View.VISIBLE);
+
                 JsonObject personJson = new JsonObject();
 
                 String userId = theHandler.getUserId();
-                personJson.addProperty("user_id", userId);
+//                personJson.addProperty("user_id", userId);
                 personJson.addProperty("account_id", userId);
-                personJson.addProperty("nickname", personName.getText().toString());
+                final String name = personName.getText().toString();
+                personJson.addProperty("nickname", name);
+
 
                 Ion.with(getApplicationContext())
                         .load(Constants.API + "/api/Persons")
@@ -75,6 +75,8 @@ public class AddPersonActivity extends AppCompatActivity {
 
                                 if(result != null) {
                                     Log.d(Constants.TAG, "Successfully posted person");
+                                    Toast.makeText(getApplicationContext(), "Added " + name, Toast.LENGTH_SHORT).show();
+                                    finish();
                                 }
                             }
                         });
@@ -82,57 +84,39 @@ public class AddPersonActivity extends AppCompatActivity {
         });
 
         theHandler = AccountHandler.newInstance(this);
-        String userid = theHandler.getUserId();
-
-        hideAllShowLoading();
-
-        Ion.with(this)
-                .load(Constants.API + "/api/PersonRooms/" + userid)
-                .asJsonArray()
-                .setCallback(new FutureCallback<JsonArray>() {
-                    @Override
-                    public void onCompleted(Exception e, JsonArray result) {
-                        if(e != null) {
-                            Log.e(Constants.TAG, "error loading rooms: ", e);
-                            return;
-                        }
-
-                        if(result != null) {
-                            String[] rooms = new String[result.size()];
-                            for(int i=0; i < result.size(); i++) {
-                                JsonObject room = result.get(i).getAsJsonObject();
-                                rooms[i] = room.get("RoomType").getAsString();
-                            }
-
-                            ArrayAdapter<String> spinnerAdapter =
-                                    new ArrayAdapter<String>(getApplicationContext(),
-                                            android.R.layout.simple_spinner_dropdown_item, rooms);
-
-                            spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                            personRoom.setAdapter(spinnerAdapter);
-
-                            hideLoadingShowAll();
-                        }
-                    }
-                });
-    }
-
-    private void hideAllShowLoading() {
-        nameTitle.setVisibility(View.INVISIBLE);
-        roomTitle.setVisibility(View.INVISIBLE);
-        personName.setVisibility(View.INVISIBLE);
-        personRoom.setVisibility(View.INVISIBLE);
-
-        loading.setVisibility(View.VISIBLE);
-    }
-
-    private void hideLoadingShowAll() {
-        nameTitle.setVisibility(View.VISIBLE);
-        roomTitle.setVisibility(View.VISIBLE);
-        personName.setVisibility(View.VISIBLE);
-        personRoom.setVisibility(View.VISIBLE);
-
-        loading.setVisibility(View.INVISIBLE);
+//        String userid = theHandler.getUserId();
+//
+//        hideAllShowLoading();
+//
+//        Ion.with(this)
+//                .load(Constants.API + "/api/PersonRooms/" + userid)
+//                .asJsonArray()
+//                .setCallback(new FutureCallback<JsonArray>() {
+//                    @Override
+//                    public void onCompleted(Exception e, JsonArray result) {
+//                        if(e != null) {
+//                            Log.e(Constants.TAG, "error loading rooms: ", e);
+//                            return;
+//                        }
+//
+//                        if(result != null) {
+//                            String[] rooms = new String[result.size()];
+//                            for(int i=0; i < result.size(); i++) {
+//                                JsonObject room = result.get(i).getAsJsonObject();
+//                                rooms[i] = room.get("RoomType").getAsString();
+//                            }
+//
+//                            ArrayAdapter<String> spinnerAdapter =
+//                                    new ArrayAdapter<String>(getApplicationContext(),
+//                                            android.R.layout.simple_spinner_dropdown_item, rooms);
+//
+//                            spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//                            personRoom.setAdapter(spinnerAdapter);
+//
+//                            hideLoadingShowAll();
+//                        }
+//                    }
+//                });
     }
 
     @Override
