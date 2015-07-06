@@ -9,6 +9,7 @@ import com.auth0.googleplus.GooglePlusIdentityProvider;
 import com.auth0.identity.IdentityProvider;
 import com.auth0.identity.IdentityProviderCallback;
 import com.auth0.identity.IdentityProviderRequest;
+import com.auth0.identity.WebIdentityProvider;
 import com.auth0.lock.Lock;
 import com.auth0.lock.LockProvider;
 
@@ -23,10 +24,12 @@ public class SyncApplication extends Application implements LockProvider {
 
     public void onCreate() {
         super.onCreate();
+
         lock = new Lock.Builder()
                 .loadFromApplication(this)
                 //TODO: add native G+ login here
                 .withIdentityProvider(Strategies.GooglePlus, new GooglePlusIdentityProvider(this))
+                .useConnections("fitbit")
                 .closable(true)
                 .build();
     }

@@ -27,6 +27,7 @@
 
     <!-- Add Sensor strings -->
     <string name="add_sensor">Add Sensor</string>
+    <string name="add_sensor_fitbit">Authenticate FitBit</string>
 
     <!-- Add Room strings -->
     <string name="add_room">Add Room</string>

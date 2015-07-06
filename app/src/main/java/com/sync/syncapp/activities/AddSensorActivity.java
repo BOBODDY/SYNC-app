@@ -1,10 +1,14 @@
 package com.sync.syncapp.activities;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sync.syncapp.Constants;
@@ -12,58 +16,29 @@ import com.sync.syncapp.R;
 
 public class AddSensorActivity extends ActionBarActivity {
 
-    final static String fitbitApi = "https://api.fitbit.com/";
+    TextView title;
+
+    Button authFitbit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_sensor);
+
+        title = (TextView) findViewById(R.id.add_sensor_title);
+
+        authFitbit = (Button) findViewById(R.id.add_sensor_fitbit);
+        authFitbit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
     }
 
     protected void onStart() {
         super.onStart();
 
-//        SharedPreferencesCredentialStore credentialStore =
-//                new SharedPreferencesCredentialStore(getApplicationContext(),
-//                        "creditial_store", new JacksonFactory());
-//
-//        AuthorizationFlow.Builder builder = new AuthorizationFlow.Builder(
-//                BearerToken.authorizationHeaderAccessMethod(),
-//                AndroidHttp.newCompatibleTransport(),
-//                new JacksonFactory(),
-//                new GenericUrl("https://www.fitbit.com/oauth2/authorize"),
-//                new ClientParametersAuthentication("229MD4", "ab74ad7dee201f8b44a7f2e4a168652d"),
-//                "229MD4",
-//                "https://www.fitbit.com/oauth2/authorize");
-//        builder.setCredentialStore(credentialStore);
-//        AuthorizationFlow flow = builder.build();
-//
-//        AuthorizationUIController controller =
-//                new DialogFragmentController(getFragmentManager()) {
-//
-//                    @Override
-//                    public String getRedirectUri() throws IOException {
-//                        return "http://localhost/Callback";
-//                    }
-//
-//                    @Override
-//                    public boolean isJavascriptEnabledForWebView() {
-//                        return true;
-//                    }
-//
-//                };
-//
-//        OAuthManager oauth = new OAuthManager(flow, controller);
-//
-//        Credential credential;
-//
-//        try {
-//            credential = oauth.authorizeImplicitly("userId", null, null).getResult();
-//            String accessToken = credential.getAccessToken();
-//            Log.d(Constants.TAG, "Access token: " + accessToken);
-//        } catch(IOException ioe) {
-//            Log.e(Constants.TAG, "error authorizing implicitly", ioe);
-//        }
     }
 
     @Override
