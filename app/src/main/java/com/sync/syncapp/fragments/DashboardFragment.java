@@ -82,19 +82,23 @@ public class DashboardFragment extends Fragment {
                         }
                         if (result != null) {
                             Log.i(Constants.TAG, "Getting the dashboard works! result: " + result);
+                            Log.i(Constants.TAG, "Number of results: " + result.size());
                             //TODO: set data based on object received
                             //example:
+                            if(result.size() > 0) {
+                                JsonObject object = result.get(0).getAsJsonObject();
+                                JsonObject summary = object.get("summary").getAsJsonObject();
+                                JsonObject esData = object.get("esdata").getAsJsonObject();
 
-                            JsonObject object = result.get(0).getAsJsonObject();
-                            JsonObject summary = object.get("summary").getAsJsonObject();
-                            JsonObject esData = object.get("esdata").getAsJsonObject();
+                                sleepDuration.setText(summary.get("totalTimeInBed").getAsString());
 
-                            sleepDuration.setText(summary.get("totalTimeInBed").getAsString());
-
-                            temperature.setText(esData.get("Temperature").getAsString() + " F");
-                            humidity.setText(esData.get("Humidity").getAsString() + "%");
-                            light.setText(esData.get("Luminance").getAsString() + " lux");
-                            co2Level.setText(esData.get("CO2Level").getAsString() + " ppm");
+                                temperature.setText(esData.get("Temperature").getAsString() + " F");
+                                humidity.setText(esData.get("Humidity").getAsString() + "%");
+                                light.setText(esData.get("Luminance").getAsString() + " lux");
+                                co2Level.setText(esData.get("CO2Level").getAsString() + " ppm");
+                            } else {
+                                //TODO: change text to say no data present
+                            }
                         }
                     }
                 });
