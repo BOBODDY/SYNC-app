@@ -32,6 +32,7 @@
     <string name="add_room">Add Room</string>
     <string name="room_type_title">Room Type</string>
     <string name="room_desc_title">Description</string>
+    <string name="room_person_title">Person</string>
 
     <!-- Add Person strings -->
     <string name="add_person">Add Person</string>

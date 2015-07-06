@@ -6,10 +6,14 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
@@ -23,14 +27,70 @@ public class AddRoomActivity extends ActionBarActivity {
 
     EditText roomType, roomDesc;
 
+    Spinner person;
+
     AccountHandler accountHandler;
+
+    ProgressBar loading;
+
+    String[] userNames, userIds;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_room);
 
-        accountHandler = AccountHandler.newInstance(getApplicationContext());
+        loading = (ProgressBar) findViewById(R.id.add_room_progress);
+        loading.setVisibility(View.INVISIBLE);
+
+        accountHandler = AccountHandler.newInstance(this);
+
+        person = (Spinner) findViewById(R.id.add_room_person);
+
+        Ion.with(this)
+                .load(Constants.API + "/api/Persons/" + accountHandler.getUserId())
+                .asJsonObject() //TODO: might need to be an array
+                .setCallback(new FutureCallback<JsonObject>() {
+                    @Override
+                    public void onCompleted(Exception e, JsonObject result) {
+                        if (e != null) {
+                            Log.e(Constants.TAG, "error loading users: ", e);
+                            return;
+                        }
+
+                        if (result != null) {
+                            loading.setVisibility(View.VISIBLE);
+                            doneButton.setEnabled(false);
+//                            if(result.size() > 0) {
+//                                userNames = new String[result.size()];
+//                                userIds = new String[result.size()];
+//
+//                                for(int i=0; i < result.size(); i++) {
+//                                    JsonObject user = result.get(i).getAsJsonObject();
+//
+//                                    userNames[i] = user.get("nickname").getAsString();
+//                                    userIds[i] = user.get("user_id").getAsString();//TODO: figure out the right property to get
+//                                }
+//
+//                                ArrayAdapter<String> users = new ArrayAdapter<String>(getApplicationContext(),
+//                                        android.R.layout.simple_spinner_dropdown_item, userNames);
+//                                person.setAdapter(users);
+//                            }
+                            userNames = new String[1];
+                            userIds = new String[1];
+
+                            userNames[0] = result.get("nickname").getAsString();
+                            userIds[0] = result.get("user_id").getAsString();
+
+                            ArrayAdapter<String> users = new ArrayAdapter<String>(getApplicationContext(),
+                                        android.R.layout.simple_spinner_dropdown_item, userNames);
+                                person.setAdapter(users);
+
+                            loading.setVisibility(View.INVISIBLE);
+                            doneButton.setEnabled(true);
+                        }
+                    }
+                });
 
         roomType = (EditText) findViewById(R.id.add_room_type);
 
@@ -40,14 +100,19 @@ public class AddRoomActivity extends ActionBarActivity {
         doneButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String roomTypeStr = roomType.getText().toString();
+                loading.setVisibility(View.VISIBLE);
+                doneButton.setEnabled(false);
+
+                final String roomTypeStr = roomType.getText().toString();
                 String roomDescStr = roomDesc.getText().toString();
 
                 JsonObject jsonObject = new JsonObject();
-                jsonObject.addProperty("user_id", accountHandler.getUserId());
+                jsonObject.addProperty("account_id", accountHandler.getUserId());
+                jsonObject.addProperty("person_id", userIds[person.getSelectedItemPosition()]);
                 jsonObject.addProperty("RoomType", roomTypeStr);
                 jsonObject.addProperty("RoomDescription", roomDescStr);
 
+                Log.d(Constants.TAG, "about to POST this: " + jsonObject);
                 Ion.with(getApplicationContext())
                         .load(Constants.API + "/api/Rooms")
                         .setJsonObjectBody(jsonObject)
@@ -62,6 +127,9 @@ public class AddRoomActivity extends ActionBarActivity {
 
                                 if(result != null) {
                                     Log.d(Constants.TAG, "Got result: " + result);
+                                    Log.d(Constants.TAG, "added room: " + roomTypeStr);
+                                    Toast.makeText(getApplicationContext(), "Added room " + roomTypeStr, Toast.LENGTH_SHORT).show();
+
                                     finish();
                                 }
                             }
