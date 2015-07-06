@@ -78,9 +78,22 @@
         <activity
             android:name=".activities.AddSensorActivity"
             android:label="@string/title_activity_add_sensor" >
-
             <intent-filter>
                 <action android:name=".activities.AddSensorActivity" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".activities.AddPersonActivity"
+            android:label="@string/title_activity_add_person"
+            android:parentActivityName=".activities.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.sync.syncapp.activities.MainActivity" />
+            <intent-filter>
+                <action android:name=".activities.AddPersonActivity" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>

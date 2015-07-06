@@ -35,4 +35,5 @@ dependencies {
     compile 'com.auth0.android:lock-googleplus:2.0.0'
     compile 'com.koushikdutta.ion:ion:2.1.6'
     compile 'com.wu-man:android-oauth-client:0.0.3'
+    compile 'com.android.support:support-v4:22.2.0'
 }

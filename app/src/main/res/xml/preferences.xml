@@ -12,4 +12,8 @@
     <Preference android:title="@string/add_room">
         <intent android:action=".activities.AddRoomActivity" />
     </Preference>
+
+    <Preference android:title="@string/add_person">
+        <intent android:action=".activities.AddPersonActivity" />
+    </Preference>
 </PreferenceScreen>

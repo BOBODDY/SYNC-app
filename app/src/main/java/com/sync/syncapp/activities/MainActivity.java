@@ -43,7 +43,17 @@ import static com.auth0.lock.Lock.CANCEL_ACTION;
 
 public class MainActivity extends AppCompatActivity {
 
-    private String drawer[] = {"Dashboard", "Settings"}; //TODO: add a logout button
+    private String drawer[] = {"Dashboard", "Settings"};
+
+    /*
+        This is for remembering the last screen.
+        If the user backs out from a subscreen of the settings (Add user, add sensor, etc)
+        They should be dropped back into the settings fragment, not the dashboard
+     */
+    private int lastScreen = -1;
+    private final int SCREEN_DASHBOARD = 0;
+    private final int SCREEN_SETTINGS = 1;
+
 
     private ActionBarDrawerToggle drawerToggle;
 
@@ -67,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
 
             Log.i(Constants.TAG, "User is successfully logged in, ~id: " + userId);
 
-            selectItem(0); // Assuming Dashboard is the first item
+            selectItem(SCREEN_DASHBOARD); // Assuming Dashboard is the first item
         }
     };
 
@@ -161,6 +171,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
+        if(lastScreen == SCREEN_DASHBOARD || lastScreen == -1) {
+            selectItem(SCREEN_DASHBOARD);
+        } else if(lastScreen == SCREEN_SETTINGS) {
+            selectItem(SCREEN_SETTINGS);
+        }
     }
 
     protected void onPostResume() {

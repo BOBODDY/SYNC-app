@@ -33,7 +33,13 @@
     <string name="room_type_title">Room Type</string>
     <string name="room_desc_title">Description</string>
 
+    <!-- Add Person strings -->
+    <string name="add_person">Add Person</string>
+    <string name="person_name">Name</string>
+    <string name="person_room">Room</string>
+
     <string name="title_activity_add_user">Add User</string>
     <string name="title_activity_add_room">Add Room</string>
     <string name="title_activity_add_sensor">Add Sensor</string>
+    <string name="title_activity_add_person">Add Person</string>
 </resources>
