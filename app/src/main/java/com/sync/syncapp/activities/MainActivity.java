@@ -69,6 +69,8 @@ public class MainActivity extends AppCompatActivity {
     private BroadcastReceiver authenticationReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            Log.d(Constants.TAG, "MainActivity intent's component: " + intent.getComponent());
+
             UserProfile profile = intent.getParcelableExtra(Lock.AUTHENTICATION_ACTION_PROFILE_PARAMETER);
             String userId = profile.getId();
 
@@ -78,6 +80,10 @@ public class MainActivity extends AppCompatActivity {
             Log.i(Constants.TAG, "User is successfully logged in, ~id: " + userId);
 
             selectItem(SCREEN_DASHBOARD); // Assuming Dashboard is the first item
+
+            Log.d(Constants.TAG, "Unregistering MainActivity BroadcastReceivers due to login");
+            broadcastManager.unregisterReceiver(authenticationReceiver);
+            broadcastManager.unregisterReceiver(cancelReceiver);
         }
     };
 
@@ -133,10 +139,6 @@ public class MainActivity extends AppCompatActivity {
         // Set the drawer toggle as the DrawerListener
         drawerLayout.setDrawerListener(drawerToggle);
 
-        broadcastManager = LocalBroadcastManager.getInstance(this);
-        broadcastManager.registerReceiver(authenticationReceiver, new IntentFilter(AUTHENTICATION_ACTION));
-        broadcastManager.registerReceiver(cancelReceiver, new IntentFilter(CANCEL_ACTION));
-
         try {
             Field mDragger = drawerLayout.getClass().getDeclaredField("mLeftDragger");//mRightDragger for right obviously
             mDragger.setAccessible(true);
@@ -191,6 +193,23 @@ public class MainActivity extends AppCompatActivity {
 
             selectItem(0); // As long as the Dashboard is the first item
         }
+    }
+
+    protected void onResume() {
+        super.onResume();
+
+        Log.d(Constants.TAG, "Registering MainActivity BroadcastReceivers");
+        broadcastManager = LocalBroadcastManager.getInstance(this);
+        broadcastManager.registerReceiver(authenticationReceiver, new IntentFilter(AUTHENTICATION_ACTION));
+        broadcastManager.registerReceiver(cancelReceiver, new IntentFilter(CANCEL_ACTION));
+    }
+
+    protected void onPause() {
+        super.onPause();
+
+        Log.d(Constants.TAG, "Unregistering MainActivity BroadcastReceivers");
+        broadcastManager.unregisterReceiver(authenticationReceiver);
+        broadcastManager.unregisterReceiver(cancelReceiver);
     }
 
     @Override
