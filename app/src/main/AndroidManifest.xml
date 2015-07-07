@@ -3,6 +3,7 @@
     package="com.sync.syncapp" >
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Needed for native Google+ login -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
 
@@ -16,6 +17,7 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
+        <!-- MainActivity -->
         <activity
             android:name=".activities.MainActivity"
             android:label="@string/app_name" >
@@ -25,6 +27,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- AddUserActivity -->
         <activity
             android:name=".activities.AddUserActivity"
             android:label="@string/title_activity_add_user"
@@ -55,6 +59,11 @@
                 <data
                     android:host="boboddy.auth0.com"
                     android:scheme="a0sutttilZfWs0l2Y2NAFq9fdj8AKdkzKZ" />
+
+                <!-- Why the hell does it send back a lowercase version?!? -->
+                <data
+                    android:host="boboddy.auth0.com"
+                    android:scheme="a0sutttilzfws0l2y2nafq9fdj8akdkzkz" />
             </intent-filter>
         </activity>
 
@@ -66,6 +75,7 @@
             android:value="boboddy.auth0.com" />
         <!-- Auth0 Lock End -->
 
+        <!-- AddRoomActivity -->
         <activity
             android:name=".activities.AddRoomActivity"
             android:label="@string/title_activity_add_room" >
@@ -75,6 +85,8 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
+        <!-- AddSensorActivity -->
         <activity
             android:name=".activities.AddSensorActivity"
             android:label="@string/title_activity_add_sensor" >
@@ -85,6 +97,7 @@
             </intent-filter>
         </activity>
 
+        <!-- AddPersonActivity -->
         <activity
             android:name=".activities.AddPersonActivity"
             android:label="@string/title_activity_add_person"
@@ -98,6 +111,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
     </application>
 
 </manifest>
