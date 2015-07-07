@@ -27,9 +27,8 @@ public class SyncApplication extends Application implements LockProvider {
 
         lock = new Lock.Builder()
                 .loadFromApplication(this)
-                //TODO: add native G+ login here
                 .withIdentityProvider(Strategies.GooglePlus, new GooglePlusIdentityProvider(this))
-                .useConnections("fitbit")
+                .useConnections("Username-Password-Authentication", "google-oauth2", "fitbit")
                 .closable(true)
                 .build();
     }
@@ -37,4 +36,5 @@ public class SyncApplication extends Application implements LockProvider {
     public Lock getLock() {
         return lock;
     }
+
 }
