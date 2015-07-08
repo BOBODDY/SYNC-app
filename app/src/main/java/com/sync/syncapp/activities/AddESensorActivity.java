@@ -42,8 +42,9 @@ public class AddESensorActivity extends ActionBarActivity {
 
         theHandler = AccountHandler.newInstance(getApplicationContext());
 
+        progress = (ProgressBar) findViewById(R.id.add_esensor_progress);
         progress.setVisibility(View.VISIBLE);
-        progress.setZ(20);
+//        progress.setZ(20);
 
         esensorType = (Spinner) findViewById(R.id.add_esensor_type);
 
