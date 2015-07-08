@@ -86,9 +86,9 @@
             </intent-filter>
         </activity>
 
-        <!-- AddSensorActivity -->
+        <!-- AddFitbitActivity -->
         <activity
-            android:name=".activities.AddSensorActivity"
+            android:name=".activities.AddFitbitActivity"
             android:label="@string/title_activity_add_sensor" >
             <intent-filter>
                 <action android:name=".activities.AddSensorActivity" />
