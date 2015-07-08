@@ -34,6 +34,7 @@
     <string name="add_esensor_type_title">Type</string>
     <string name="add_esensor_name_title">Name</string>
     <string name="add_esensor_device_id_title">Device ID</string>
+    <string name="add_esensor_room_title">Room</string>
     <array name="add_sensor_types">
         <item>Aeon</item>
         <item>Yoctopuce</item>

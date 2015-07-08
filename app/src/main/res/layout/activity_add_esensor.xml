@@ -65,12 +65,32 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/add_esensor_room_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/add_esensor_device_id_layout"
+        android:layout_marginTop="25dp">
+
+        <TextView
+            android:text="@string/add_esensor_room_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <Spinner
+            android:id="@+id/add_esensor_room"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:entries="@array/add_sensor_types"/>
+
+    </LinearLayout>
+
     <Button
         android:id="@+id/add_esensor_done"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/add"
-        android:layout_below="@id/add_esensor_device_id_layout"
+        android:layout_below="@id/add_esensor_room_layout"
         android:layout_marginTop="20dp"
         android:layout_centerHorizontal="true"/>
 
