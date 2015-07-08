@@ -5,8 +5,12 @@
         <intent android:action=".activities.AddUserActivity" />
     </Preference>
 
-    <Preference android:title="@string/add_sensor">
-        <intent android:action=".activities.AddSensorActivity" />
+    <Preference android:title="@string/add_fitbit">
+        <intent android:action=".activities.AddFitbitActivity" />
+    </Preference>
+
+    <Preference android:title="@string/add_esensor">
+        <intent android:action=".activities.AddESensorActivity" />
     </Preference>
 
     <Preference android:title="@string/add_room">

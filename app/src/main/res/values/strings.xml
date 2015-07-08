@@ -25,10 +25,19 @@
     <string name="room">Room:</string>
     <string name="add">Add</string>
 
-    <!-- Add Sensor strings -->
-    <string name="add_sensor">Add Sensor</string>
+    <!-- Add Fitbit strings -->
+    <string name="add_fitbit">Add Fitbit</string>
     <string name="add_sensor_fitbit">Authenticate FitBit</string>
 
+    <!-- Add Environmental Sensor strings -->
+    <string name="add_esensor">Add Environmental</string>
+    <string name="add_esensor_type_title">Type</string>
+    <string name="add_esensor_name_title">Name</string>
+    <string name="add_esensor_device_id_title">Device ID</string>
+    <array name="add_sensor_types">
+        <item>Aeon</item>
+        <item>Yoctopuce</item>
+    </array>
     <!-- Add Room strings -->
     <string name="add_room">Add Room</string>
     <string name="room_type_title">Room Type</string>
@@ -44,4 +53,5 @@
     <string name="title_activity_add_room">Add Room</string>
     <string name="title_activity_add_sensor">Add Sensor</string>
     <string name="title_activity_add_person">Add Person</string>
+    <string name="title_activity_add_esensor">Add Environmental Sensor</string>
 </resources>

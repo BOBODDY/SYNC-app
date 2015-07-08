@@ -75,6 +75,7 @@
             android:value="boboddy.auth0.com" />
         <!-- Auth0 Lock End -->
 
+
         <!-- AddRoomActivity -->
         <activity
             android:name=".activities.AddRoomActivity"
@@ -91,7 +92,7 @@
             android:name=".activities.AddFitbitActivity"
             android:label="@string/title_activity_add_sensor" >
             <intent-filter>
-                <action android:name=".activities.AddSensorActivity" />
+                <action android:name=".activities.AddFitbitActivity" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
@@ -105,6 +106,7 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.sync.syncapp.activities.MainActivity" />
+
             <intent-filter>
                 <action android:name=".activities.AddPersonActivity" />
 
@@ -112,6 +114,21 @@
             </intent-filter>
         </activity>
 
+        <!-- AddESensorActivity -->
+        <activity
+            android:name=".activities.AddESensorActivity"
+            android:label="@string/title_activity_add_esensor"
+            android:parentActivityName=".activities.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.sync.syncapp.activities.MainActivity" />
+
+            <intent-filter>
+                <action android:name=".activities.AddESensorActivity" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
