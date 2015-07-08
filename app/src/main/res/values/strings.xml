@@ -30,7 +30,7 @@
     <string name="add_sensor_fitbit">Authenticate FitBit</string>
 
     <!-- Add Environmental Sensor strings -->
-    <string name="add_esensor">Add Environmental</string>
+    <string name="add_esensor">Add Environmental Sensor</string>
     <string name="add_esensor_type_title">Type</string>
     <string name="add_esensor_name_title">Name</string>
     <string name="add_esensor_device_id_title">Device ID</string>
