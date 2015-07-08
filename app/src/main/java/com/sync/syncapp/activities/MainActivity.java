@@ -74,16 +74,23 @@ public class MainActivity extends AppCompatActivity {
             UserProfile profile = intent.getParcelableExtra(Lock.AUTHENTICATION_ACTION_PROFILE_PARAMETER);
             String userId = profile.getId();
 
-//            accountHandler.setUserId(userId);
-            accountHandler.addAccount(profile);
+            Log.d(Constants.TAG, "current userID: '" + userId + "'");
 
-            Log.i(Constants.TAG, "User is successfully logged in, ~id: " + userId);
+            if(accountHandler.getUserId().equals("")) {
+                accountHandler.addAccount(profile);
 
-            selectItem(SCREEN_DASHBOARD); // Assuming Dashboard is the first item
+                Log.i(Constants.TAG, "User is successfully logged in, ~id: " + userId);
 
-            Log.d(Constants.TAG, "Unregistering MainActivity BroadcastReceivers due to login");
-            broadcastManager.unregisterReceiver(authenticationReceiver);
-            broadcastManager.unregisterReceiver(cancelReceiver);
+                selectItem(SCREEN_DASHBOARD); // Assuming Dashboard is the first item
+
+                Log.d(Constants.TAG, "Unregistering MainActivity BroadcastReceivers due to login");
+                broadcastManager.unregisterReceiver(authenticationReceiver);
+                broadcastManager.unregisterReceiver(cancelReceiver);
+            } else {
+                Log.d(Constants.TAG, "User is already logged in, must be a fitbit login");
+            }
+
+
         }
     };
 
@@ -155,6 +162,11 @@ public class MainActivity extends AppCompatActivity {
         } catch(IllegalAccessException iae) {
             Log.e(Constants.TAG, "IllegalAccessException: ", iae);
         }
+
+        Log.d(Constants.TAG, "Registering MainActivity BroadcastReceivers");
+        broadcastManager = LocalBroadcastManager.getInstance(this);
+        broadcastManager.registerReceiver(authenticationReceiver, new IntentFilter(AUTHENTICATION_ACTION));
+        broadcastManager.registerReceiver(cancelReceiver, new IntentFilter(CANCEL_ACTION));
     }
 
     private boolean isFirstRun() {
@@ -195,21 +207,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    protected void onResume() {
-        super.onResume();
-
-        Log.d(Constants.TAG, "Registering MainActivity BroadcastReceivers");
-        broadcastManager = LocalBroadcastManager.getInstance(this);
-        broadcastManager.registerReceiver(authenticationReceiver, new IntentFilter(AUTHENTICATION_ACTION));
-        broadcastManager.registerReceiver(cancelReceiver, new IntentFilter(CANCEL_ACTION));
-    }
-
-    protected void onPause() {
-        super.onPause();
-
+    protected void onDestroy() {
         Log.d(Constants.TAG, "Unregistering MainActivity BroadcastReceivers");
         broadcastManager.unregisterReceiver(authenticationReceiver);
         broadcastManager.unregisterReceiver(cancelReceiver);
+
+        super.onDestroy();
     }
 
     @Override
