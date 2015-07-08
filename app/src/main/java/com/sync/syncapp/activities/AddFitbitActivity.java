@@ -20,8 +20,10 @@ import com.auth0.core.UserIdentity;
 import com.auth0.core.UserProfile;
 import com.auth0.lock.Lock;
 import com.auth0.lock.LockActivity;
+import com.google.gson.JsonObject;
 import com.sync.syncapp.Constants;
 import com.sync.syncapp.R;
+import com.sync.syncapp.util.AccountHandler;
 
 import java.util.List;
 
@@ -46,6 +48,9 @@ public class AddFitbitActivity extends Activity {
             String a = "";
             String clientId = (String) profile.getExtraInfo().get("clientID");
 
+            String fitbitId = profile.getId().split("\\|")[1];
+            Log.d(Constants.TAG, "user_id: " + fitbitId);
+
             Log.d(Constants.TAG, "extra info: " + profile.getExtraInfo());
 
             a += "Client ID: " + clientId + "\n";
@@ -53,26 +58,21 @@ public class AddFitbitActivity extends Activity {
             Log.d(Constants.TAG, "profile.getIdentities(): " + profile.getIdentities());
 
             //TODO: can't get identities without a ClassCastException
-            List<UserIdentity> idents = profile.getIdentities();
-            Log.d(Constants.TAG, "idents: " + idents);
 
-//            for(int i=0; i < idents.size(); i++) {
-//                Log.d(Constants.TAG, "identity: " + idents.get(0));
-//
-//                UserIdentity identity = (UserIdentity) idents.get(i);
-//
-//                String token = identity.getAccessToken();
-////                String token = (String) identity.get("access_token");
-//                String tokenSecret = identity.getAccessTokenSecret();
-////                String tokenSecret = (String) identity.get("access_token_secret");
-//                String userId = identity.getId();
-////                String userId = (String) identity.get("user_id");
-//
-//                a += "Access Token: " + token + "\n";
-//                a += "Access Token Secret: " + tokenSecret + "\n";
-//                a += "User ID: " + userId + "\n";
-//                a += "\n";
-//            }
+            //TODO: do we need these? get them
+            String apiKey = "";
+            String apiSecret = "";
+
+            AccountHandler handler = AccountHandler.newInstance(getApplicationContext());
+            String userId = handler.getUserId();
+
+            JsonObject jason = new JsonObject();
+            jason.addProperty("pstype", "Fitbit");
+            jason.addProperty("fitbit_user_id", fitbitId);
+            jason.addProperty("account_id", userId);
+            jason.addProperty("description", "Fitbit for user: " + userId);
+            jason.addProperty("api_key", apiKey);
+            jason.addProperty("api_secret", apiSecret);
 
             title.setText(a);
         }
