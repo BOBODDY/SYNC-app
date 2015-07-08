@@ -41,18 +41,18 @@ public class AddRoomActivity extends ActionBarActivity {
         setContentView(R.layout.activity_add_room);
 
         loading = (ProgressBar) findViewById(R.id.add_room_progress);
-        loading.setVisibility(View.INVISIBLE);
+        loading.setVisibility(View.VISIBLE);
 
         accountHandler = AccountHandler.newInstance(this);
 
         person = (Spinner) findViewById(R.id.add_room_person);
 
         Ion.with(this)
-                .load(Constants.API + "/api/Persons/" + accountHandler.getUserId())
-                .asJsonObject() //TODO: might need to be an array
-                .setCallback(new FutureCallback<JsonObject>() {
+                .load(Constants.API + "/api/AccountPersons/" + accountHandler.getUserId())
+                .asJsonArray()
+                .setCallback(new FutureCallback<JsonArray>() {
                     @Override
-                    public void onCompleted(Exception e, JsonObject result) {
+                    public void onCompleted(Exception e, JsonArray result) {
                         if (e != null) {
                             Log.e(Constants.TAG, "error loading users: ", e);
                             return;
@@ -61,33 +61,34 @@ public class AddRoomActivity extends ActionBarActivity {
                         if (result != null) {
                             loading.setVisibility(View.VISIBLE);
                             doneButton.setEnabled(false);
-//                            if(result.size() > 0) {
-//                                userNames = new String[result.size()];
-//                                userIds = new String[result.size()];
-//
-//                                for(int i=0; i < result.size(); i++) {
-//                                    JsonObject user = result.get(i).getAsJsonObject();
-//
-//                                    userNames[i] = user.get("nickname").getAsString();
-//                                    userIds[i] = user.get("user_id").getAsString();//TODO: figure out the right property to get
-//                                }
-//
-//                                ArrayAdapter<String> users = new ArrayAdapter<String>(getApplicationContext(),
-//                                        android.R.layout.simple_spinner_dropdown_item, userNames);
-//                                person.setAdapter(users);
-//                            }
-                            userNames = new String[1];
-                            userIds = new String[1];
 
-                            userNames[0] = result.get("nickname").getAsString();
-                            userIds[0] = result.get("user_id").getAsString();
+                            if(result.size() > 0) {
+                                userNames = new String[result.size()];
+                                userIds = new String[result.size()];
 
-                            ArrayAdapter<String> users = new ArrayAdapter<String>(getApplicationContext(),
+                                for(int i=0; i < result.size(); i++) {
+                                    JsonObject user = result.get(i).getAsJsonObject();
+
+                                    userNames[i] = user.get("nickname").getAsString();
+                                    userIds[i] = user.get("id").getAsString();
+                                }
+
+                                ArrayAdapter<String> users = new ArrayAdapter<String>(getApplicationContext(),
                                         android.R.layout.simple_spinner_dropdown_item, userNames);
                                 person.setAdapter(users);
 
-                            loading.setVisibility(View.INVISIBLE);
-                            doneButton.setEnabled(true);
+                                loading.setVisibility(View.INVISIBLE);
+                                doneButton.setEnabled(true);
+                            } else {
+                                String[] noUsers = {"No users added"};
+
+                                ArrayAdapter<String> users = new ArrayAdapter<String>(getApplicationContext(),
+                                        android.R.layout.simple_spinner_dropdown_item, noUsers);
+                                person.setAdapter(users);
+
+                                loading.setVisibility(View.INVISIBLE);
+                                doneButton.setEnabled(false);
+                            }
                         }
                     }
                 });
