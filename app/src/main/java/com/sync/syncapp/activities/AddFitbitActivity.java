@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -30,7 +31,7 @@ import java.util.List;
 import static com.auth0.lock.Lock.AUTHENTICATION_ACTION;
 import static com.auth0.lock.Lock.CANCEL_ACTION;
 
-public class AddFitbitActivity extends Activity {
+public class AddFitbitActivity extends ActionBarActivity {
 
     TextView title;
     Button authFitbit;

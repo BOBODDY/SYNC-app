@@ -33,6 +33,9 @@
             android:name=".activities.AddUserActivity"
             android:label="@string/title_activity_add_user"
             android:parentActivityName=".activities.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.sync.syncapp.activities.MainActivity" />
             <intent-filter>
                 <action android:name=".activities.AddUserActivity" />
 
@@ -79,7 +82,8 @@
         <!-- AddRoomActivity -->
         <activity
             android:name=".activities.AddRoomActivity"
-            android:label="@string/title_activity_add_room" >
+            android:label="@string/title_activity_add_room"
+            android:parentActivityName=".activities.MainActivity">
             <intent-filter>
                 <action android:name=".activities.AddRoomActivity" />
 
@@ -90,7 +94,12 @@
         <!-- AddFitbitActivity -->
         <activity
             android:name=".activities.AddFitbitActivity"
-            android:label="@string/title_activity_add_sensor" >
+            android:label="@string/title_activity_add_sensor"
+            android:parentActivityName=".activities.MainActivity">
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.sync.syncapp.activities.MainActivity" />
             <intent-filter>
                 <action android:name=".activities.AddFitbitActivity" />
 
