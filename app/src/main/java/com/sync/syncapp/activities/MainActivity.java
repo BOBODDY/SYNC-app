@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         If the user backs out from a subscreen of the settings (Add user, add sensor, etc)
         They should be dropped back into the settings fragment, not the dashboard
      */
-    private int lastScreen = -1;
+    private static int lastScreen = -1;
     private final int SCREEN_DASHBOARD = 0;
     private final int SCREEN_SETTINGS = 1;
 
@@ -185,11 +185,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        if(lastScreen == SCREEN_DASHBOARD || lastScreen == -1) {
-            selectItem(SCREEN_DASHBOARD);
-        } else if(lastScreen == SCREEN_SETTINGS) {
-            selectItem(SCREEN_SETTINGS);
-        }
+//        if(lastScreen == SCREEN_DASHBOARD || lastScreen == -1) {
+//            selectItem(SCREEN_DASHBOARD);
+//        } else if(lastScreen == SCREEN_SETTINGS) {
+//            selectItem(SCREEN_SETTINGS);
+//        }
     }
 
     protected void onPostResume() {
@@ -203,7 +203,11 @@ public class MainActivity extends AppCompatActivity {
         } else {
             String userId = getSharedPreferences(Constants.PREFS, 0).getString(Constants.USER_ID, "");
 
-            selectItem(0); // As long as the Dashboard is the first item
+            if(lastScreen != -1) {
+                selectItem(lastScreen);
+            } else {
+                selectItem(SCREEN_DASHBOARD);
+            }
         }
     }
 
@@ -269,8 +273,10 @@ public class MainActivity extends AppCompatActivity {
 
         //This is probably very bad
         if(position == 0) {
+            lastScreen = SCREEN_DASHBOARD;
             fragment = new DashboardFragment();
         } else if(position == 1) {
+            lastScreen = SCREEN_SETTINGS;
             fragment = new SettingsFragment();
         }
 
