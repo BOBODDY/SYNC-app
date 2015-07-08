@@ -97,7 +97,12 @@ public class DashboardFragment extends Fragment {
                                 light.setText(esData.get("Luminance").getAsString() + " lux");
                                 co2Level.setText(esData.get("CO2Level").getAsString() + " ppm");
                             } else {
-                                //TODO: change text to say no data present
+                                String noData = "No data received";
+                                sleepDuration.setText(noData);
+                                temperature.setText(noData);
+                                humidity.setText(noData);
+                                light.setText(noData);
+                                co2Level.setText(noData);
                             }
                         }
                     }

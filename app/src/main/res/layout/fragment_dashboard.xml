@@ -92,7 +92,7 @@
             android:id="@+id/dash_light_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="LIGHT"
+            android:text="@string/dash_light_default"
             android:layout_below="@id/dash_light_title"
             android:layout_marginTop="5dp"
             android:layout_centerHorizontal="true"

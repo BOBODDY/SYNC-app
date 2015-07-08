@@ -10,14 +10,15 @@
 
     <!-- Dashboard strings -->
     <string name="dash_sleep_title">Sleep Duration</string>
-    <string name="dash_sleep_default">0 hrs 0 min</string>
+    <string name="dash_sleep_default">No data received</string>
     <string name="dash_co2_title">CO2</string>
-    <string name="dash_co2_default">1234 ppm</string>
+    <string name="dash_co2_default">No data received</string>
     <string name="dash_temp_title">Temperature</string>
-    <string name="dash_temp_default">68F</string>
+    <string name="dash_temp_default">No data received</string>
     <string name="dash_light_title">Light Intensity</string>
+    <string name="dash_light_default">No data received</string>
     <string name="dash_humidity_title">Humidity</string>
-    <string name="dash_humidity_default">60%</string>
+    <string name="dash_humidity_default">No data received</string>
     
     <!-- Add User strings -->
     <string name="add_user">Add User</string>
