@@ -16,12 +16,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.auth0.core.UserIdentity;
 import com.auth0.core.UserProfile;
 import com.auth0.lock.Lock;
 import com.auth0.lock.LockActivity;
 import com.google.gson.JsonObject;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
 import com.sync.syncapp.Constants;
 import com.sync.syncapp.R;
 import com.sync.syncapp.util.AccountHandler;
@@ -45,24 +48,33 @@ public class AddFitbitActivity extends ActionBarActivity {
             UserProfile profile = intent.getParcelableExtra(Lock.AUTHENTICATION_ACTION_PROFILE_PARAMETER);
 
             Log.d(Constants.TAG, "Received login (hopefully fitbit) " + profile);
-            //TODO: get token from intent extras
+
             String a = "";
             String clientId = (String) profile.getExtraInfo().get("clientID");
-
-            String fitbitId = profile.getId().split("\\|")[1];
-            Log.d(Constants.TAG, "user_id: " + fitbitId);
 
             Log.d(Constants.TAG, "extra info: " + profile.getExtraInfo());
 
             a += "Client ID: " + clientId + "\n";
 
-            Log.d(Constants.TAG, "profile.getIdentities(): " + profile.getIdentities());
+            List<UserIdentity> identities = profile.getIdentities();
+            Log.d(Constants.TAG, "profile.getIdentities(): " + identities);
 
-            //TODO: can't get identities without a ClassCastException
-
-            //TODO: do we need these? get them
+            //We do need them, they'll come from the identities list
             String apiKey = "";
             String apiSecret = "";
+            String fitbitId = "";
+
+            int size = identities.size();
+            for(int i=0; i < size; i++) {
+                UserIdentity identity = identities.get(i);
+
+                apiKey = identity.getAccessToken();
+                apiSecret = identity.getAccessTokenSecret();
+
+                fitbitId = identity.getId();
+                Log.d(Constants.TAG, "user_id: " + fitbitId);
+            }
+
 
             AccountHandler handler = AccountHandler.newInstance(getApplicationContext());
             String userId = handler.getUserId();
@@ -74,6 +86,31 @@ public class AddFitbitActivity extends ActionBarActivity {
             jason.addProperty("description", "Fitbit for user: " + userId);
             jason.addProperty("api_key", apiKey);
             jason.addProperty("api_secret", apiSecret);
+
+            a += "fitbit user id: " + fitbitId + "\n";
+            a += "access token: " + apiKey + "\n";
+            a += "access secret: " + apiSecret + "\n";
+
+            Ion.with(getApplicationContext())
+                    .load(Constants.API + "/api/PSensors")
+                    .setJsonObjectBody(jason)
+                    .asJsonObject()
+                    .setCallback(new FutureCallback<JsonObject>() {
+                        @Override
+                        public void onCompleted(Exception e, JsonObject result) {
+                            if(e != null) {
+                                Log.e(Constants.TAG, "error pushing fitbit data", e);
+                                Toast.makeText(getApplicationContext(), "Failed to add Fitbit. Try again.", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+
+                            if(result != null) {
+                                Log.d(Constants.TAG, "successfully added fitbit");
+                                Toast.makeText(getApplicationContext(), "Added Fitbit", Toast.LENGTH_SHORT).show();
+                                finish();
+                            }
+                        }
+                    });
 
             title.setText(a);
         }
