@@ -42,6 +42,7 @@ public class ApiWrapper {
     public List<Account> getAccounts() {
         final List<Account> accounts = new ArrayList<>();
 
+        // TODO: set authorization headers
         Ion.with(getContext())
                 .load(Constants.API + "/api/Accounts")
                 .asJsonObject()

@@ -92,6 +92,7 @@ public class AddFitbitActivity extends ActionBarActivity {
             a += "access token: " + apiKey + "\n";
             a += "access secret: " + apiSecret + "\n";
 
+            // TODO: set authorization headers
             Ion.with(getApplicationContext())
                     .load(Constants.API + "/api/PSensors")
                     .setJsonObjectBody(jason)

@@ -73,7 +73,7 @@ public class AddESensorActivity extends ActionBarActivity {
                 json.addProperty("Device_ID", deviceId);
                 json.addProperty("room_id", roomId);
 
-                //TODO: send data to backend
+                //TODO: set authorization headers
                 Ion.with(getApplicationContext())
                         .load(Constants.API + "/api/ESensors")
                         .setJsonObjectBody(json)
@@ -99,6 +99,8 @@ public class AddESensorActivity extends ActionBarActivity {
         });
 
         esensorRoom = (Spinner) findViewById(R.id.add_esensor_room);
+        
+        // TODO: set authorization headers
         Ion.with(getApplicationContext())
                 .load(Constants.API + "/api/AccountRooms/" + theHandler.getUserId())
                 .asJsonArray()

@@ -47,6 +47,7 @@ public class AddRoomActivity extends ActionBarActivity {
 
         person = (Spinner) findViewById(R.id.add_room_person);
 
+        // TODO: set authorization headers
         Ion.with(this)
                 .load(Constants.API + "/api/AccountPersons/" + accountHandler.getUserId())
                 .asJsonArray()
@@ -114,6 +115,8 @@ public class AddRoomActivity extends ActionBarActivity {
                 jsonObject.addProperty("RoomDescription", roomDescStr);
 
                 Log.d(Constants.TAG, "about to POST this: " + jsonObject);
+                
+                // TODO: set authorization headers
                 Ion.with(getApplicationContext())
                         .load(Constants.API + "/api/Rooms")
                         .setJsonObjectBody(jsonObject)

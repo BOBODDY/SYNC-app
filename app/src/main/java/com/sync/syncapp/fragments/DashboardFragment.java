@@ -70,6 +70,7 @@ public class DashboardFragment extends Fragment {
         humidity = (TextView) getActivity().findViewById(R.id.dash_humidity_value);
         light = (TextView) getActivity().findViewById(R.id.dash_light_value);
 
+        // TODO: set authorization headers
         Ion.with(getActivity().getApplicationContext())
                 .load(Constants.API + "/api/Dashboard")
                 .asJsonArray()

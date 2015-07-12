@@ -85,6 +85,7 @@ public class AccountHandler {
         json.addProperty("nickname", nickname);
         json.addProperty("picture", picture);
 
+        // TODO: set authorization headers
         Ion.with(context)
                 .load(Constants.API + "/api/Accounts")
                 .setJsonObjectBody(json)
