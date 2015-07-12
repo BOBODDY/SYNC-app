@@ -75,8 +75,9 @@ public class AddFitbitActivity extends ActionBarActivity {
                 Log.d(Constants.TAG, "user_id: " + fitbitId);
             }
 
-
-            AccountHandler handler = AccountHandler.newInstance(getApplicationContext());
+            // You, were my oppressor
+            AccountHandler /* now, you are my */ handler = 
+                    AccountHandler.newInstance(getApplicationContext());
             String userId = handler.getUserId();
 
             JsonObject jason = new JsonObject();
