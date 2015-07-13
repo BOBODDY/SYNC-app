@@ -50,6 +50,11 @@
     <string name="add_person">Add Person</string>
     <string name="person_name">Name</string>
     <string name="person_room">Room</string>
+    
+    <!-- Statistics strings -->
+    <string name="toggle_co2">CO2</string>
+    <string name="toggle_temp">Temp</string>
+    <string name="toggle_light">Light</string>
 
     <string name="title_activity_add_user">Add User</string>
     <string name="title_activity_add_room">Add Room</string>

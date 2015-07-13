@@ -23,9 +23,9 @@ android {
     }
 }
 
-//repositories {
-//    maven { url "https://jitpack.io" }
-//}
+repositories {
+    maven { url "https://jitpack.io" }
+}
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -34,4 +34,5 @@ dependencies {
     compile 'com.auth0.android:lock:1.9.5'
     compile 'com.auth0.android:lock-googleplus:2.0.0'
     compile 'com.koushikdutta.ion:ion:2.1.6'
+    compile 'com.github.PhilJay:MPAndroidChart:v2.1.0'
 }
