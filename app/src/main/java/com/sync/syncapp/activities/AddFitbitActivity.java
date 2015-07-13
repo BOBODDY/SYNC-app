@@ -76,7 +76,8 @@ public class AddFitbitActivity extends ActionBarActivity {
             }
 
             // You, were my oppressor
-            AccountHandler /* now, you are my */ handler = 
+            // and I have been programmed to obey
+            AccountHandler /* and now, you are my */ handler = 
                     AccountHandler.newInstance(getApplicationContext());
             String userId = handler.getUserId();
 
@@ -91,10 +92,10 @@ public class AddFitbitActivity extends ActionBarActivity {
             a += "fitbit user id: " + fitbitId + "\n";
             a += "access token: " + apiKey + "\n";
             a += "access secret: " + apiSecret + "\n";
-
-            // TODO: set authorization headers
+            
             Ion.with(getApplicationContext())
                     .load(Constants.API + "/api/PSensors")
+                    .setHeader(Constants.AUTH_KEY, Constants.AUTH_VALUE)
                     .setJsonObjectBody(jason)
                     .asJsonObject()
                     .setCallback(new FutureCallback<JsonObject>() {

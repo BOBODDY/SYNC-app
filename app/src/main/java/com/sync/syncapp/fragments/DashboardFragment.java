@@ -70,9 +70,9 @@ public class DashboardFragment extends Fragment {
         humidity = (TextView) getActivity().findViewById(R.id.dash_humidity_value);
         light = (TextView) getActivity().findViewById(R.id.dash_light_value);
 
-        // TODO: set authorization headers
         Ion.with(getActivity().getApplicationContext())
                 .load(Constants.API + "/api/Dashboard")
+                .setHeader(Constants.AUTH_KEY, Constants.AUTH_VALUE)
                 .asJsonArray()
                 .setCallback(new FutureCallback<JsonArray>() {
                     @Override
@@ -84,7 +84,7 @@ public class DashboardFragment extends Fragment {
                         if (result != null) {
                             Log.i(Constants.TAG, "Getting the dashboard works! result: " + result);
                             Log.i(Constants.TAG, "Number of results: " + result.size());
-                            //TODO: set data based on object received
+                            
                             //example:
                             if(result.size() > 0) {
                                 JsonObject object = result.get(0).getAsJsonObject();

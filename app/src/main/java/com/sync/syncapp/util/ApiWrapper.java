@@ -1,7 +1,9 @@
 package com.sync.syncapp.util;
 
+import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
@@ -63,4 +65,25 @@ public class ApiWrapper {
         return accounts;
     }
 
+    public static void postESensor(final Context c, String dest, final JsonObject object) {
+        Ion.with(c)
+                .load(dest)
+                .setHeader(Constants.AUTH_KEY, Constants.AUTH_VALUE)
+                .setJsonObjectBody(object)
+                .asJsonObject()
+                .setCallback(new FutureCallback<JsonObject>() {
+                    @Override
+                    public void onCompleted(Exception e, JsonObject result) {
+                        if(e != null) {
+                            Log.e(Constants.TAG, "error pushing e-sensor", e);
+                            return;
+                        }
+
+                        if(result != null) {
+                            Log.d(Constants.TAG, "Successfully pushed e-sensor " + object.get("name").getAsString());
+                            ((Activity) c).finish();
+                        }
+                    }
+                });
+    }
 }

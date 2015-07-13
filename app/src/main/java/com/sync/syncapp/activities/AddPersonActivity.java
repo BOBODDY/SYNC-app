@@ -60,9 +60,10 @@ public class AddPersonActivity extends AppCompatActivity {
                 final String name = personName.getText().toString();
                 personJson.addProperty("nickname", name);
 
-                // TODO: set authorization headers
+                // TODO: ApiWrapper.postPerson()
                 Ion.with(getApplicationContext())
                         .load(Constants.API + "/api/Persons")
+                        .setHeader(Constants.AUTH_KEY, Constants.AUTH_VALUE)
                         .setJsonObjectBody(personJson)
                         .asJsonObject()
                         .setCallback(new FutureCallback<JsonObject>() {

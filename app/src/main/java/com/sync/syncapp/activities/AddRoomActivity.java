@@ -47,9 +47,9 @@ public class AddRoomActivity extends ActionBarActivity {
 
         person = (Spinner) findViewById(R.id.add_room_person);
 
-        // TODO: set authorization headers
         Ion.with(this)
                 .load(Constants.API + "/api/AccountPersons/" + accountHandler.getUserId())
+                .setHeader(Constants.AUTH_KEY, Constants.AUTH_VALUE)
                 .asJsonArray()
                 .setCallback(new FutureCallback<JsonArray>() {
                     @Override
@@ -116,9 +116,9 @@ public class AddRoomActivity extends ActionBarActivity {
 
                 Log.d(Constants.TAG, "about to POST this: " + jsonObject);
                 
-                // TODO: set authorization headers
                 Ion.with(getApplicationContext())
                         .load(Constants.API + "/api/Rooms")
+                        .setHeader(Constants.AUTH_KEY, Constants.AUTH_VALUE)
                         .setJsonObjectBody(jsonObject)
                         .asJsonObject()
                         .setCallback(new FutureCallback<JsonObject>() {

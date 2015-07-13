@@ -57,12 +57,12 @@ public class AccountHandler {
         setUserId(user_id);
         String connection = "";
         String email = profile.getEmail();
-        //TODO: make this work. identities.get(0) is returning a LinkedHashMap instead of UserIdentity for some reason
-//        List<UserIdentity> identities = profile.getIdentities();
-//        Log.i(Constants.TAG, "identities: " + identities.get(0));
-//        UserIdentity identity = identities.get(0);
-//        String provider = identity.getProvider();
-        String provider = "auth0";
+        
+        List<UserIdentity> identities = profile.getIdentities();
+        Log.i(Constants.TAG, "identities: " + identities.get(0));
+        UserIdentity identity = identities.get(0);
+        String provider = identity.getProvider();
+//        String provider = "auth0"; // from ye olden times when the sdk was broken
         String nickname = profile.getNickname();
         String picture = profile.getPictureURL();
 
@@ -85,9 +85,9 @@ public class AccountHandler {
         json.addProperty("nickname", nickname);
         json.addProperty("picture", picture);
 
-        // TODO: set authorization headers
         Ion.with(context)
                 .load(Constants.API + "/api/Accounts")
+                .setHeader(Constants.AUTH_KEY, Constants.AUTH_VALUE)
                 .setJsonObjectBody(json)
                 .asJsonObject()
                 .setCallback(new FutureCallback<JsonObject>() {

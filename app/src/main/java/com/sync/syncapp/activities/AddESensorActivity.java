@@ -1,5 +1,6 @@
 package com.sync.syncapp.activities;
 
+import android.app.Activity;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,6 +21,7 @@ import com.koushikdutta.ion.Ion;
 import com.sync.syncapp.Constants;
 import com.sync.syncapp.R;
 import com.sync.syncapp.util.AccountHandler;
+import com.sync.syncapp.util.ApiWrapper;
 
 public class AddESensorActivity extends ActionBarActivity {
 
@@ -73,52 +75,52 @@ public class AddESensorActivity extends ActionBarActivity {
                 json.addProperty("Device_ID", deviceId);
                 json.addProperty("room_id", roomId);
 
-                //TODO: set authorization headers
+//              TODO:  ApiWrapper.postESensor(getApplicationContext(), Constants.API + "/api/ESensors", json);
                 Ion.with(getApplicationContext())
                         .load(Constants.API + "/api/ESensors")
+                        .setHeader(Constants.AUTH_KEY, Constants.AUTH_VALUE)
                         .setJsonObjectBody(json)
                         .asJsonObject()
                         .setCallback(new FutureCallback<JsonObject>() {
                             @Override
                             public void onCompleted(Exception e, JsonObject result) {
-                                //TODO: handle the result
                                 if(e != null) {
-                                    Log.e(Constants.TAG, "error pushing to e-sensors", e);
+                                    Log.e(Constants.TAG, "error pushing e-sensor", e);
                                     return;
                                 }
 
                                 if(result != null) {
-                                    Log.d(Constants.TAG, "Successfully pushed e-sensor");
+                                    Log.d(Constants.TAG, "Successfully pushed e-sensor " + name);
                                     Toast.makeText(getApplicationContext(), "Successfully added sensor " + name, Toast.LENGTH_SHORT).show();
                                     finish();
                                 }
                             }
                         });
-
             }
         });
 
         esensorRoom = (Spinner) findViewById(R.id.add_esensor_room);
         
-        // TODO: set authorization headers
+        // TODO: ApiWrapper.getAccountRooms()
         Ion.with(getApplicationContext())
                 .load(Constants.API + "/api/AccountRooms/" + theHandler.getUserId())
+                .setHeader(Constants.AUTH_KEY, Constants.AUTH_VALUE)
                 .asJsonArray()
                 .setCallback(new FutureCallback<JsonArray>() {
                     @Override
                     public void onCompleted(Exception e, JsonArray result) {
-                        if(e != null) {
+                        if (e != null) {
                             Log.e(Constants.TAG, "error fetching rooms in AddESensorActivity", e);
                             return;
                         }
 
-                        if(result != null) {
+                        if (result != null) {
                             int size = result.size();
-                            if(size > 0) {
+                            if (size > 0) {
                                 roomNames = new String[size];
                                 roomIds = new String[size];
 
-                                for(int i=0; i< size; i++) {
+                                for (int i = 0; i < size; i++) {
                                     JsonObject room = result.get(i).getAsJsonObject();
 
                                     String roomName = room.get("RoomType").getAsString();
