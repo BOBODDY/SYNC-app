@@ -43,17 +43,17 @@ import static com.auth0.lock.Lock.CANCEL_ACTION;
 
 public class MainActivity extends AppCompatActivity {
 
-    private String drawer[] = {"Dashboard", "Settings"};
+    private String drawer[] = {"Dashboard", "Statistics", "Settings"};
 
     /*
         This is for remembering the last screen.
         If the user backs out from a subscreen of the settings (Add user, add sensor, etc)
         They should be dropped back into the settings fragment, not the dashboard
      */
-    private static int lastScreen = -1;
     private final int SCREEN_DASHBOARD = 0;
-    private final int SCREEN_SETTINGS = 1;
-
+    private final int SCREEN_STATISTICS = 1;
+    private final int SCREEN_SETTINGS = 2;
+    private static int lastScreen = -1;
 
     private ActionBarDrawerToggle drawerToggle;
 
@@ -182,16 +182,6 @@ public class MainActivity extends AppCompatActivity {
         return super.onPrepareOptionsMenu(menu);
     }
 
-    protected void onStart() {
-        super.onStart();
-
-//        if(lastScreen == SCREEN_DASHBOARD || lastScreen == -1) {
-//            selectItem(SCREEN_DASHBOARD);
-//        } else if(lastScreen == SCREEN_SETTINGS) {
-//            selectItem(SCREEN_SETTINGS);
-//        }
-    }
-
     protected void onPostResume() {
         super.onPostResume();
 
@@ -272,10 +262,14 @@ public class MainActivity extends AppCompatActivity {
         Fragment fragment = null;
 
         //This is probably very bad
-        if(position == 0) {
+        if(position == SCREEN_DASHBOARD) {
             lastScreen = SCREEN_DASHBOARD;
             fragment = new DashboardFragment();
-        } else if(position == 1) {
+        } else if(position == SCREEN_STATISTICS) {
+            //TODO: make a statistics fragment and set it here
+            lastScreen = SCREEN_STATISTICS;
+            //fragment = new StatisticsFragment();
+        } else if(position == SCREEN_SETTINGS) {
             lastScreen = SCREEN_SETTINGS;
             fragment = new SettingsFragment();
         }
