@@ -132,7 +132,7 @@ public class AddESensorActivity extends ActionBarActivity {
 
                                 ArrayAdapter<String> roomAdapter =
                                         new ArrayAdapter<>(getApplicationContext(),
-                                                android.R.layout.simple_spinner_dropdown_item,
+                                                R.layout.spinner_item,
                                                 roomNames);
                                 esensorRoom.setAdapter(roomAdapter);
                                 doneButton.setEnabled(true);
@@ -141,7 +141,7 @@ public class AddESensorActivity extends ActionBarActivity {
                             String[] noRooms = {"No rooms added"};
                             ArrayAdapter<String> roomAdapter =
                                     new ArrayAdapter<>(getApplicationContext(),
-                                            android.R.layout.simple_spinner_dropdown_item,
+                                            R.layout.spinner_item,
                                             noRooms);
                             esensorRoom.setAdapter(roomAdapter);
 

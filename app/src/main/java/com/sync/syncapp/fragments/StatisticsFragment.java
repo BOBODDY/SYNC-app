@@ -2,13 +2,18 @@ package com.sync.syncapp.fragments;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.RadioGroup;
 
 import com.github.mikephil.charting.charts.LineChart;
+import com.sync.syncapp.Constants;
 import com.sync.syncapp.R;
 
 /**
@@ -45,8 +50,13 @@ public class StatisticsFragment extends Fragment {
         
         Activity a = getActivity();
         toggleCo2 = (CheckBox) a.findViewById(R.id.stats_toggle_co2);
+        toggleCo2.setOnCheckedChangeListener(new ToggleCheckChangeListener());
+        
         toggleTemp = (CheckBox) a.findViewById(R.id.stats_toggle_temp);
+        toggleTemp.setOnCheckedChangeListener(new ToggleCheckChangeListener());
+        
         toggleLight = (CheckBox) a.findViewById(R.id.stats_toggle_light);
+        toggleLight.setOnCheckedChangeListener(new ToggleCheckChangeListener());
         
         chart = (LineChart) a.findViewById(R.id.stats_chart);
         
@@ -58,5 +68,30 @@ public class StatisticsFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_statistics, container, false);
+    }
+    
+    private class SetUpGraphTask extends AsyncTask<Void, Void, Void> {
+        protected Void doInBackground(Void... params) {
+            return null;
+        }
+    }
+    
+    private class ToggleCheckChangeListener implements CompoundButton.OnCheckedChangeListener {
+        @Override
+        public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+            int toggleId = compoundButton.getId();
+            
+            switch (toggleId) {
+                case R.id.stats_toggle_co2:
+                    break;
+                case R.id.stats_toggle_temp:
+                    break;
+                case R.id.stats_toggle_light:
+                    break;
+                default:
+                    Log.e(Constants.TAG, "Unknown button id: " + toggleId);
+                    break;
+            }
+        }
     }
 }

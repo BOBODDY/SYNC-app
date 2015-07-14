@@ -75,7 +75,7 @@ public class AddRoomActivity extends ActionBarActivity {
                                 }
 
                                 ArrayAdapter<String> users = new ArrayAdapter<String>(getApplicationContext(),
-                                        android.R.layout.simple_spinner_dropdown_item, userNames);
+                                        R.layout.spinner_item, userNames);
                                 person.setAdapter(users);
 
                                 loading.setVisibility(View.INVISIBLE);
@@ -84,7 +84,7 @@ public class AddRoomActivity extends ActionBarActivity {
                                 String[] noUsers = {"No users added"};
 
                                 ArrayAdapter<String> users = new ArrayAdapter<String>(getApplicationContext(),
-                                        android.R.layout.simple_spinner_dropdown_item, noUsers);
+                                        R.layout.spinner_item, noUsers);
                                 person.setAdapter(users);
 
                                 loading.setVisibility(View.INVISIBLE);
