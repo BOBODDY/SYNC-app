@@ -34,6 +34,7 @@ import com.sync.syncapp.Constants;
 import com.sync.syncapp.fragments.DashboardFragment;
 import com.sync.syncapp.R;
 import com.sync.syncapp.fragments.SettingsFragment;
+import com.sync.syncapp.fragments.StatisticsFragment;
 import com.sync.syncapp.util.AccountHandler;
 
 import java.lang.reflect.Field;
@@ -268,7 +269,7 @@ public class MainActivity extends AppCompatActivity {
         } else if(position == SCREEN_STATISTICS) {
             //TODO: make a statistics fragment and set it here
             lastScreen = SCREEN_STATISTICS;
-            //fragment = new StatisticsFragment();
+            fragment = new StatisticsFragment();
         } else if(position == SCREEN_SETTINGS) {
             lastScreen = SCREEN_SETTINGS;
             fragment = new SettingsFragment();

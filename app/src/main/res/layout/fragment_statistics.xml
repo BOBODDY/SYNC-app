@@ -2,19 +2,26 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent">
     
+    <Spinner
+        android:id="@+id/stats_room_dropdown"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"/>
+    
     <LinearLayout
         android:id="@+id/stats_checkbox_layout"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/stats_room_dropdown"
         android:gravity="center"
-        android:layout_marginTop="20dp" >
+        android:layout_marginTop="10dp" >
 
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/toggle_co2"
             android:id="@+id/stats_toggle_co2"
-            android:checked="false" />
+            android:checked="true" />
 
         <!--android:layout_marginTop="37dp"-->
         <!--android:layout_alignParentTop="true"-->
@@ -26,7 +33,7 @@
             android:layout_height="wrap_content"
             android:text="@string/toggle_temp"
             android:id="@+id/stats_toggle_temp"
-            android:checked="false" />
+            android:checked="true" />
 
         <!--android:layout_alignTop="@+id/stats_toggle_co2"-->
         <!--android:layout_toRightOf="@+id/stats_toggle_co2"-->
@@ -37,18 +44,33 @@
             android:layout_height="wrap_content"
             android:text="@string/toggle_light"
             android:id="@+id/stats_toggle_light"
-            android:checked="false" />
+            android:checked="true" />
 
         <!--android:layout_alignTop="@+id/stats_toggle_temp"-->
         <!--android:layout_toRightOf="@+id/stats_toggle_temp"-->
         <!--android:layout_toEndOf="@+id/stats_toggle_temp"-->
     </LinearLayout>
 
-    
+    <TextView
+        android:id="@+id/stats_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/stats_checkbox_layout"
+        android:layout_marginTop="15dp"
+        android:text="Please choose a room"/>
 
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/stats_chart"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/stats_checkbox_layout"/>
+    
+    <ProgressBar
+        android:id="@+id/stats_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:indeterminate="true"/>
 </RelativeLayout>
