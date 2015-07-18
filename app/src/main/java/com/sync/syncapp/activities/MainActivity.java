@@ -12,6 +12,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.design.widget.NavigationView;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.ViewDragHelper;
@@ -42,7 +43,7 @@ import java.lang.reflect.Field;
 import static com.auth0.lock.Lock.AUTHENTICATION_ACTION;
 import static com.auth0.lock.Lock.CANCEL_ACTION;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private String drawer[] = {"Dashboard", "Statistics", "Settings"};
 
@@ -59,10 +60,7 @@ public class MainActivity extends AppCompatActivity {
     private ActionBarDrawerToggle drawerToggle;
 
     private DrawerLayout drawerLayout;
-    private ListView drawerList;
-
-    private CharSequence title;
-    private CharSequence drawerTitle;
+    NavigationView drawerList;
 
     AccountHandler accountHandler;
 
@@ -111,41 +109,9 @@ public class MainActivity extends AppCompatActivity {
         accountHandler = AccountHandler.newInstance(getApplicationContext());
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawerList = (ListView) findViewById(R.id.left_drawer);
-
-        // Set up the adapter for the listview
-        drawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, drawer));
-        drawerList.setOnItemClickListener(new DrawerItemClickListener());
-
-        title = drawerTitle = getTitle();
-
-        drawerToggle = new ActionBarDrawerToggle(
-                this,
-                drawerLayout,
-                R.string.drawer_open,
-                R.string.drawer_close) {
-
-            /** Called when a drawer has settled in a completely closed state. */
-            public void onDrawerClosed(View view) {
-                super.onDrawerClosed(view);
-                if(getActionBar() != null) {
-                    getActionBar().setTitle(title);
-                }
-                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
-            }
-
-            /** Called when a drawer has settled in a completely open state. */
-            public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
-                if(getActionBar() != null) {
-                    getActionBar().setTitle(drawerTitle);
-                }
-                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
-            }
-        };
-
-        // Set the drawer toggle as the DrawerListener
-        drawerLayout.setDrawerListener(drawerToggle);
+        
+        drawerList = (NavigationView) findViewById(R.id.drawer_list);
+        drawerList.setNavigationItemSelectedListener(this);
 
         try {
             Field mDragger = drawerLayout.getClass().getDeclaredField("mLeftDragger");//mRightDragger for right obviously
@@ -250,15 +216,55 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private class DrawerItemClickListener implements ListView.OnItemClickListener {
+    //TODO: this may be eligible for deletion
+    private class DrawerItemClickListener implements NavigationView.OnNavigationItemSelectedListener {
         @Override
-        public void onItemClick(AdapterView parent, View view, int position, long id) {
-            selectItem(position);
+        public boolean onNavigationItemSelected(MenuItem menuItem) {
+            int menuId = menuItem.getItemId();
+            switch (menuId) {
+                case R.id.drawer_dashboard:
+                    lastScreen = SCREEN_DASHBOARD;
+                    selectItem(SCREEN_DASHBOARD);
+                    return true;
+                case R.id.drawer_statistics:
+                    lastScreen = SCREEN_STATISTICS;
+                    selectItem(SCREEN_STATISTICS);
+                    return true;
+                case R.id.drawer_settings:
+                    lastScreen = SCREEN_SETTINGS;
+                    selectItem(SCREEN_SETTINGS);
+                    return true;
+                default:
+                    Log.e(Constants.TAG, "Unknown drawer menu item");
+                
+            }
+            return false;
         }
     }
 
+    public boolean onNavigationItemSelected(MenuItem menuItem) {
+        int menuId = menuItem.getItemId();
+        switch (menuId) {
+            case R.id.drawer_dashboard:
+                lastScreen = SCREEN_DASHBOARD;
+                selectItem(SCREEN_DASHBOARD);
+                return true;
+            case R.id.drawer_statistics:
+                lastScreen = SCREEN_STATISTICS;
+                selectItem(SCREEN_STATISTICS);
+                return true;
+            case R.id.drawer_settings:
+                lastScreen = SCREEN_SETTINGS;
+                selectItem(SCREEN_SETTINGS);
+                return true;
+            default:
+                Log.e(Constants.TAG, "Unknown drawer menu item");
+
+        }
+        return false;
+    }
+
     /** Swaps fragments in the main content view */
-    //TODO: This is causing issues when logging out and logging back in again. Fix it.
     private void selectItem(int position) {
         Fragment fragment = null;
 
@@ -267,7 +273,6 @@ public class MainActivity extends AppCompatActivity {
             lastScreen = SCREEN_DASHBOARD;
             fragment = new DashboardFragment();
         } else if(position == SCREEN_STATISTICS) {
-            //TODO: make a statistics fragment and set it here
             lastScreen = SCREEN_STATISTICS;
             fragment = new StatisticsFragment();
         } else if(position == SCREEN_SETTINGS) {
@@ -287,8 +292,7 @@ public class MainActivity extends AppCompatActivity {
                 .commitAllowingStateLoss();
 
         // Highlight the selected item, update the title, and close the drawer
-        drawerList.setItemChecked(position, true);
-        setTitle(drawer[position]);
+        
         drawerLayout.closeDrawer(drawerList);
     }
 

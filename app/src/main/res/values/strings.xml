@@ -4,10 +4,14 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="action_logout">Logout</string>
-
+    
+    <!-- Drawer strings -->
+    <string name="drawer_dashboard">Dashboard</string>
+    <string name="drawer_statistics">Statistics</string>
+    <string name="drawer_settings">Settings</string>
     <string name="drawer_open">Drawer Open</string>
     <string name="drawer_close">Drawer Closed</string>
-
+    
     <!-- Dashboard strings -->
     <string name="dash_sleep_title">Sleep Duration</string>
     <string name="dash_sleep_default">No data received</string>
