@@ -44,6 +44,7 @@
         <item>Aeon</item>
         <item>Yoctopuce</item>
     </array>
+    
     <!-- Add Room strings -->
     <string name="add_room">Add Room</string>
     <string name="room_type_title">Room Type</string>

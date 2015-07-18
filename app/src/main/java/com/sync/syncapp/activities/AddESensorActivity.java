@@ -74,6 +74,14 @@ public class AddESensorActivity extends ActionBarActivity {
                 json.addProperty("description", type + " sensor added to " + userId);
                 json.addProperty("Device_ID", deviceId);
                 json.addProperty("room_id", roomId);
+                
+                if(type.equals("Aeon")) {
+                    json.addProperty("manufacturer", "Aeon Labs");
+                    json.addProperty("product", "4in1MS 4 in one MultiSensor");
+                } else if(type.equals("Yoctopuce")) {
+                    json.addProperty("manufacturer", "Yoctopuce");
+                    json.addProperty("product", "CO2 Sensor");
+                }
 
 //              TODO:  ApiWrapper.postESensor(getApplicationContext(), Constants.API + "/api/ESensors", json);
                 Ion.with(getApplicationContext())
