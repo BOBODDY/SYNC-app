@@ -24,6 +24,8 @@ public class Room {
     String roomType;
     String roomDescription;
     
+    
+    
     public Room() {
         this(null, null, "", "", "");
     }

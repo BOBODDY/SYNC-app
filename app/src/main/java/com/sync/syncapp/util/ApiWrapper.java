@@ -63,9 +63,9 @@ public class ApiWrapper {
                             Log.e(Constants.TAG, "error getting Rooms for account", e);
                             return;
                         }
-                        Log.d(Constants.TAG, "this is the result: " + result);
-
                         if (result != null) {
+                            Log.d(Constants.TAG, "this is the result: " + result);
+                            
                             int size = result.size();
                             if (size > 0) {
 
