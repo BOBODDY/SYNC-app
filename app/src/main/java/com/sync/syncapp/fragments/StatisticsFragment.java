@@ -24,12 +24,14 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 import com.sync.syncapp.Constants;
 import com.sync.syncapp.R;
 import com.sync.syncapp.model.Account;
+import com.sync.syncapp.model.Person;
 import com.sync.syncapp.model.Room;
 import com.sync.syncapp.util.AccountHandler;
 import com.sync.syncapp.util.ApiWrapper;
@@ -49,6 +51,7 @@ public class StatisticsFragment extends Fragment {
     
     AccountHandler handler;
     ApiWrapper apiWrapper;
+    Account account;
     
     CheckBox toggleCo2;
     CheckBox toggleTemp;
@@ -87,6 +90,7 @@ public class StatisticsFragment extends Fragment {
         context = a.getApplicationContext();
         handler = AccountHandler.newInstance(context);
         apiWrapper = ApiWrapper.newInstance(context, new Account(handler.getUserId()));
+        account = new Account(handler.getUserId());
         
         toggleCo2 = (CheckBox) a.findViewById(R.id.stats_toggle_co2);
         toggleCo2.setOnCheckedChangeListener(new ToggleCheckChangeListener());
@@ -124,19 +128,55 @@ public class StatisticsFragment extends Fragment {
             }
         });
         
-        rooms = apiWrapper.getAccountRooms();
-        if(rooms.size() == 0) {
-            Room emptyRoom = new Room();
-            emptyRoom.setRoomType("No Rooms Added");
-            
-            rooms = new ArrayList<>();
-            rooms.add(new Room());
-        }
-        ArrayAdapter<Room> adapter = new ArrayAdapter<>(context, R.layout.spinner_item, rooms);
-        roomDropdown.setAdapter(adapter);
+//        rooms = apiWrapper.getAccountRooms(); // I wish I could synchronize this
+        rooms = new ArrayList<>();
+        Ion.with(context)
+                .load(Constants.API + "/api/AccountRooms/" + account.getUserId())
+                .setHeader(Constants.AUTH_KEY, Constants.AUTH_VALUE)
+                .asJsonArray()
+                .setCallback(new FutureCallback<JsonArray>() {
+                    @Override
+                    public void onCompleted(Exception e, JsonArray result) {
+                        if (e != null) {
+                            Log.e(Constants.TAG, "error getting Rooms for account", e);
+                            return;
+                        }
+                        if (result != null) {
+                            Log.d(Constants.TAG, "this is the result: " + result);
+
+                            int size = result.size();
+                            if (size > 0) {
+
+                                for (int i = 0; i < size; i++) {
+                                    JsonObject room = result.get(i).getAsJsonObject();
+
+                                    String roomName = room.get("RoomType").getAsString();
+                                    String roomId = room.get("id").getAsString();
+
+                                    Room newRoom = new Room(account, new Person(account, ""), "", roomName, "");
+                                    newRoom.setId(roomId);
+
+                                    rooms.add(newRoom);
+                                }
+
+                                Log.d(Constants.TAG, "populating the dropdown");
+                                ArrayAdapter<Room> adapter = new ArrayAdapter<>(context, R.layout.spinner_item, rooms);
+                                roomDropdown.setAdapter(adapter);
+                            } else {
+                                rooms = new ArrayList<>();
+                                Room noRoom = new Room();
+                                noRoom.setRoomType("No rooms added");
+                                
+                                ArrayAdapter<Room> adapter = new ArrayAdapter<>(context, R.layout.spinner_item, rooms);
+                                roomDropdown.setAdapter(adapter);
+                            }
+
+                        }
+                    }
+                });
         
         //TODO: get statistics and set up the line chart
-        updateGraph(currentRoomId);
+        updateGraph("");
     }
     
     private void updateGraph(final String roomId) {
@@ -144,20 +184,40 @@ public class StatisticsFragment extends Fragment {
             chart.setVisibility(View.INVISIBLE);
             status.setVisibility(View.VISIBLE);
         } else {
-            //Set off an API call for the room esdata. if successful, launch an AsyncTask to update the graph
+            // Set off an API call for the user's personal data
+            // If successful, launch another call for the room's esdata
+            // If that is successful, start an UpdateGraphTask
             Ion.with(context)
-                    .load(Constants.API + "/api/RoomESData/" + roomId)
-                    .asJsonObject()
-                    .setCallback(new FutureCallback<JsonObject>() {
+                    .load(Constants.API + "/api/PSDataByFitBitUser/3GTVKM") //TODO: figure out how to store and retrieve this
+                    .setHeader(Constants.AUTH_KEY, Constants.AUTH_VALUE)
+                    .asJsonArray()
+                    .setCallback(new FutureCallback<JsonArray>() {
                         @Override
-                        public void onCompleted(Exception e, JsonObject result) {
+                        public void onCompleted(Exception e, JsonArray result) {
                             if(e != null) {
-                                Log.e(Constants.TAG, "Error fetching room data for id " + roomId, e);
+                                Log.e(Constants.TAG, "Error getting fitbit data for user", e);
                                 return;
                             }
-                            
                             if(result != null) {
-                                new UpdateGraphTask().execute(result);
+                                final JsonArray sleepData = result;
+
+                                Ion.with(context)
+                                        .load(Constants.API + "/api/RoomESData/" + roomId)
+                                        .setHeader(Constants.AUTH_KEY, Constants.AUTH_VALUE)
+                                        .asJsonObject()
+                                        .setCallback(new FutureCallback<JsonObject>() {
+                                            @Override
+                                            public void onCompleted(Exception e, JsonObject result) {
+                                                if(e != null) {
+                                                    Log.e(Constants.TAG, "Error fetching room data for id " + roomId, e);
+                                                    return;
+                                                }
+
+                                                if(result != null) {
+                                                    new UpdateGraphTask().execute(result, sleepData);
+                                                }
+                                            }
+                                        });
                             }
                         }
                     });
@@ -170,9 +230,12 @@ public class StatisticsFragment extends Fragment {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_statistics, container, false);
     }
-    
-    private class UpdateGraphTask extends AsyncTask<JsonObject, Void, Void> {
-        protected Void doInBackground(JsonObject... params) {
+
+    /**
+     * Pass the ESData as the first parameter and the sleep data as the second
+     */
+    private class UpdateGraphTask extends AsyncTask<JsonElement, Void, Void> {
+        protected Void doInBackground(JsonElement... params) {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -186,7 +249,9 @@ public class StatisticsFragment extends Fragment {
             
             ArrayList<String> dates = new ArrayList<>();
             
-            JsonArray result = params[0].getAsJsonArray("Result");
+            JsonObject esData = params[0].getAsJsonObject();
+            
+            JsonArray result = esData.getAsJsonArray("Result");
             int size = result.size();
             if(size > 0) {
                 for(int i = 0; i < size; i++) {
@@ -197,7 +262,7 @@ public class StatisticsFragment extends Fragment {
                     
                     //Get the CO2 data if the user wants it
                     if(co2Toggled) {
-                        if(datapoint.has("CO2Level")) {
+                        if(datapoint.has("CO2Level") && !datapoint.get("CO2Level").isJsonNull()) {
                             co2Data.add(new Entry(
                                     Float.valueOf(datapoint.get("CO2Level").getAsString()), 
                                     i
@@ -208,7 +273,7 @@ public class StatisticsFragment extends Fragment {
                     
                     //Get the light data if the user wants it
                     if(lightToggled) {
-                        if(datapoint.has("Luminance")) {
+                        if(datapoint.has("Luminance") && !datapoint.get("Luminance").isJsonNull()) {
                             lightData.add(new Entry(
                                     Float.valueOf(datapoint.get("Luminance").getAsString()),
                                     i
@@ -234,6 +299,17 @@ public class StatisticsFragment extends Fragment {
                 }
             }
             
+            JsonArray sleepData = params[1].getAsJsonArray();
+            
+            //TODO: create a data set for sleep data and plot on graph
+            int sleepSize = sleepData.size();
+            if(sleepSize > 0) {
+                for(int i=0; i < sleepSize; i++) {
+                    JsonObject dp = sleepData.get(i).getAsJsonObject();
+                    JsonArray sleep = dp.get("sleep").getAsJsonArray();
+                }
+            }
+            
             ArrayList<LineDataSet> dataSets = new ArrayList<>();
             
             LineDataSet co2DataSet;
@@ -242,27 +318,37 @@ public class StatisticsFragment extends Fragment {
             
             if(co2Data.size() > 0) {
                 co2DataSet = new LineDataSet(co2Data, "CO2");
+                co2DataSet.setColor(getResources().getColor(R.color.color_co2));
+                co2DataSet.setCircleColor(getResources().getColor(R.color.color_co2));
+                co2DataSet.setCircleColorHole(getResources().getColor(R.color.color_co2));
                 dataSets.add(co2DataSet);
             }
             
             if(tempData.size() > 0) {
                 tempDataSet = new LineDataSet(tempData, "Temp");
+                tempDataSet.setColor(getResources().getColor(R.color.color_temp));
+                tempDataSet.setCircleColor(getResources().getColor(R.color.color_temp));
+                tempDataSet.setCircleColorHole(getResources().getColor(R.color.color_temp));
                 dataSets.add(tempDataSet);
             }
             
             if(lightData.size() > 0) {
                 lightDataSet = new LineDataSet(lightData, "Light");
+                lightDataSet.setColor(getResources().getColor(R.color.color_light));
+                lightDataSet.setCircleColor(getResources().getColor(R.color.color_light));
+                lightDataSet.setCircleColorHole(getResources().getColor(R.color.color_light));
                 dataSets.add(lightDataSet);
             }
 
             LineData data = new LineData(dates, dataSets);
             
             chart.setData(data);
-            chart.invalidate();
             
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    chart.invalidate();
+                    
                     status.setVisibility(View.INVISIBLE);
                     chart.setVisibility(View.VISIBLE);
                     
@@ -278,6 +364,8 @@ public class StatisticsFragment extends Fragment {
         public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
             int toggleId = compoundButton.getId();
             
+            Log.d(Constants.TAG, "Toggling " + compoundButton.getText() + " to " + isChecked);
+            
             switch (toggleId) {
                 case R.id.stats_toggle_co2:
                     co2Toggled = isChecked;
@@ -290,8 +378,11 @@ public class StatisticsFragment extends Fragment {
                     break;
                 default:
                     Log.e(Constants.TAG, "Unknown button id: " + toggleId);
+                    
                     break;
             }
+            
+            updateGraph(currentRoomId);
         }
     }
 }
