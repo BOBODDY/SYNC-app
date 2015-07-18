@@ -25,6 +25,10 @@ public class Account {
         this.nickname = nickname;
         this.pictureUrl = pictureUrl;
     }
+    
+    public Account(String userId) {
+        this(userId, "", "", "", "", "");
+    }
 
     public String getUserId() {
         return userId;

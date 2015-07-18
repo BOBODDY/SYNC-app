@@ -29,10 +29,14 @@ import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 import com.sync.syncapp.Constants;
 import com.sync.syncapp.R;
+import com.sync.syncapp.model.Account;
+import com.sync.syncapp.model.Room;
 import com.sync.syncapp.util.AccountHandler;
+import com.sync.syncapp.util.ApiWrapper;
 
 import java.security.cert.LDAPCertStoreParameters;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -44,6 +48,7 @@ public class StatisticsFragment extends Fragment {
     Context context;
     
     AccountHandler handler;
+    ApiWrapper apiWrapper;
     
     CheckBox toggleCo2;
     CheckBox toggleTemp;
@@ -53,7 +58,9 @@ public class StatisticsFragment extends Fragment {
     TextView status;
     ProgressBar progress;
     
-    String[] roomNames, roomIds;
+//    String[] roomNames, roomIds;
+    List<Room> rooms;
+    String currentRoomId = "";
     
     boolean co2Toggled;
     boolean tempToggled;
@@ -78,6 +85,8 @@ public class StatisticsFragment extends Fragment {
         
         final Activity a = getActivity();
         context = a.getApplicationContext();
+        handler = AccountHandler.newInstance(context);
+        apiWrapper = ApiWrapper.newInstance(context, new Account(handler.getUserId()));
         
         toggleCo2 = (CheckBox) a.findViewById(R.id.stats_toggle_co2);
         toggleCo2.setOnCheckedChangeListener(new ToggleCheckChangeListener());
@@ -100,14 +109,13 @@ public class StatisticsFragment extends Fragment {
         progress = (ProgressBar) a.findViewById(R.id.stats_progress);
         progress.setVisibility(View.INVISIBLE);
         
-        handler = AccountHandler.newInstance(context);
-        
         roomDropdown = (Spinner) a.findViewById(R.id.stats_room_dropdown);
         roomDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Log.d(Constants.TAG, "Setting the room to " + roomNames[position]);
-                updateGraph(roomIds[position]);
+                Log.d(Constants.TAG, "Setting the room to " + rooms.get(position).getRoomType());
+                currentRoomId = rooms.get(position).getId();
+                updateGraph(currentRoomId);
             }
 
             @Override
@@ -115,57 +123,20 @@ public class StatisticsFragment extends Fragment {
 
             }
         });
-        Ion.with(context)
-                .load(Constants.API + "/api/AccountRooms/" + handler.getUserId())
-                .setHeader(Constants.AUTH_KEY, Constants.AUTH_VALUE)
-                .asJsonArray()
-                .setCallback(new FutureCallback<JsonArray>() {
-                    @Override
-                    public void onCompleted(Exception e, JsonArray result) {
-                        if (e != null) {
-                            Log.e(Constants.TAG, "error getting Rooms for account", e);
-                            return;
-                        }
-                        Log.d(Constants.TAG, "this is the result: " + result);
-//                        JsonArray result = arr.getAsJsonArray();
-
-                        if (result != null) {
-                            int size = result.size();
-                            if (size > 0) {
-                                roomNames = new String[size];
-                                roomIds = new String[size];
-
-                                for (int i = 0; i < size; i++) {
-                                    JsonObject room = result.get(i).getAsJsonObject();
-
-                                    roomNames[i] = room.get("RoomType").getAsString();
-                                    roomIds[i] = room.get("id").getAsString();
-                                }
-
-                                ArrayAdapter<String> roomAdapter =
-                                        new ArrayAdapter<>(context,
-                                                R.layout.spinner_item,
-                                                roomNames);
-                                roomDropdown.setAdapter(roomAdapter);
-                            } else {
-                                String[] noRooms = {"No rooms added"};
-                                String[] noIds = {""};
-                                ArrayAdapter<String> roomAdapter =
-                                        new ArrayAdapter<>(context,
-                                                R.layout.spinner_item,
-                                                noRooms);
-                                roomDropdown.setAdapter(roomAdapter);
-
-                                roomNames = noRooms;
-                                roomIds = noIds;
-                            }
-
-                        }
-                    }
-                });
+        
+        rooms = apiWrapper.getAccountRooms();
+        if(rooms.size() == 0) {
+            Room emptyRoom = new Room();
+            emptyRoom.setRoomType("No Rooms Added");
+            
+            rooms = new ArrayList<>();
+            rooms.add(new Room());
+        }
+        ArrayAdapter<Room> adapter = new ArrayAdapter<>(context, R.layout.spinner_item, rooms);
+        roomDropdown.setAdapter(adapter);
         
         //TODO: get statistics and set up the line chart
-        updateGraph("");
+        updateGraph(currentRoomId);
     }
     
     private void updateGraph(final String roomId) {
