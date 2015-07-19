@@ -1,11 +1,16 @@
 package com.sync.syncapp.fragments;
 
+import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.gson.JsonArray;
@@ -14,10 +19,15 @@ import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 import com.sync.syncapp.Constants;
 import com.sync.syncapp.R;
+import com.sync.syncapp.model.Account;
+import com.sync.syncapp.model.Person;
+import com.sync.syncapp.model.Room;
 import com.sync.syncapp.util.AccountHandler;
 
 import org.json.JSONArray;
 import org.w3c.dom.Text;
+
+import java.util.ArrayList;
 
 
 /**
@@ -32,6 +42,11 @@ public class DashboardFragment extends Fragment {
     AccountHandler accountHandler;
 
     TextView sleepDuration, co2Level, light, temperature, humidity;
+
+    Spinner roomDropdown;
+
+    ArrayList<Room> rooms;
+    String currentRoomId = "";
 
     /**
      * Use this factory method to create a new instance of
@@ -64,50 +79,131 @@ public class DashboardFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-        sleepDuration = (TextView) getActivity().findViewById(R.id.dash_sleep_value);
-        co2Level = (TextView) getActivity().findViewById(R.id.dash_co2_value);
-        temperature = (TextView) getActivity().findViewById(R.id.dash_temp_value);
-        humidity = (TextView) getActivity().findViewById(R.id.dash_humidity_value);
-        light = (TextView) getActivity().findViewById(R.id.dash_light_value);
+        Activity activity = getActivity();
+        final Context context = activity.getApplicationContext();
 
-        Ion.with(getActivity().getApplicationContext())
-                .load(Constants.API + "/api/Dashboard")
+        final Account account = new Account(accountHandler.getUserId());
+
+        sleepDuration = (TextView) activity.findViewById(R.id.dash_sleep_value);
+        co2Level = (TextView) activity.findViewById(R.id.dash_co2_value);
+        temperature = (TextView) activity.findViewById(R.id.dash_temp_value);
+        humidity = (TextView) activity.findViewById(R.id.dash_humidity_value);
+        light = (TextView) activity.findViewById(R.id.dash_light_value);
+
+        roomDropdown = (Spinner) activity.findViewById(R.id.dash_room_dropdown);
+        roomDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Log.d(Constants.TAG, "Setting the room to " + rooms.get(position).getRoomType());
+                currentRoomId = rooms.get(position).getId();
+                updateDashboard();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+        Ion.with(context)
+                .load(Constants.API + "/api/AccountRooms/" + account.getUserId())
                 .setHeader(Constants.AUTH_KEY, Constants.AUTH_VALUE)
                 .asJsonArray()
                 .setCallback(new FutureCallback<JsonArray>() {
                     @Override
                     public void onCompleted(Exception e, JsonArray result) {
                         if (e != null) {
-                            Log.e(Constants.TAG, "error loading dashboard:", e);
+                            Log.e(Constants.TAG, "error getting Rooms for account", e);
                             return;
                         }
                         if (result != null) {
-                            Log.i(Constants.TAG, "Getting the dashboard works! result: " + result);
-                            Log.i(Constants.TAG, "Number of results: " + result.size());
-                            
-                            //example:
-                            if(result.size() > 0) {
-                                JsonObject object = result.get(0).getAsJsonObject();
-                                JsonObject summary = object.get("summary").getAsJsonObject();
-                                JsonObject esData = object.get("esdata").getAsJsonObject();
+                            Log.d(Constants.TAG, "this is the result: " + result);
 
-                                sleepDuration.setText(summary.get("totalTimeInBed").getAsString());
+                            int size = result.size();
+                            if (size > 0) {
+                                rooms = new ArrayList<>();
+                                for (int i = 0; i < size; i++) {
+                                    JsonObject room = result.get(i).getAsJsonObject();
 
-                                temperature.setText(esData.get("Temperature").getAsString() + " F");
-                                humidity.setText(esData.get("Humidity").getAsString() + "%");
-                                light.setText(esData.get("Luminance").getAsString() + " lux");
-                                co2Level.setText(esData.get("CO2Level").getAsString() + " ppm");
+                                    String roomName = room.get("RoomType").getAsString();
+                                    String roomId = room.get("id").getAsString();
+
+                                    Room newRoom = new Room(account, new Person(account, ""), "", roomName, "");
+                                    newRoom.setId(roomId);
+
+                                    rooms.add(newRoom);
+                                }
+
+                                Log.d(Constants.TAG, "populating the dropdown");
+                                ArrayAdapter<Room> adapter = new ArrayAdapter<>(context, R.layout.spinner_item, rooms);
+                                roomDropdown.setAdapter(adapter);
                             } else {
-                                String noData = "No data received";
-                                sleepDuration.setText(noData);
-                                temperature.setText(noData);
-                                humidity.setText(noData);
-                                light.setText(noData);
-                                co2Level.setText(noData);
+                                rooms = new ArrayList<>();
+                                Room noRoom = new Room();
+                                noRoom.setRoomType("No rooms added");
+
+                                ArrayAdapter<Room> adapter = new ArrayAdapter<>(context, R.layout.spinner_item, rooms);
+                                roomDropdown.setAdapter(adapter);
                             }
+
                         }
                     }
                 });
+    }
+
+    public void updateDashboard() {
+        if(currentRoomId.equals("")) {
+            String noData = "No data received";
+            sleepDuration.setText(noData);
+            temperature.setText(noData);
+            humidity.setText(noData);
+            light.setText(noData);
+            co2Level.setText(noData);
+        } else {
+            Log.d(Constants.TAG, "the room id: " + currentRoomId);
+            Ion.with(getActivity().getApplicationContext())
+                    .load(Constants.API + "/api/RoomESData/" + currentRoomId)
+                    .setHeader(Constants.AUTH_KEY, Constants.AUTH_VALUE)
+                    .asJsonObject()
+                    .setCallback(new FutureCallback<JsonObject>() {
+                        @Override
+                        public void onCompleted(Exception e, JsonObject array) {
+                            if(e != null) {
+                                Log.e(Constants.TAG, "error fetching es data in Dashboard", e);
+                                return;
+                            }
+                            if(array != null) {
+                                JsonArray result = array.get("Result").getAsJsonArray();
+                                int size = result.size();
+                                if (size > 0) {
+                                    JsonObject object = result.get(size - 1).getAsJsonObject();
+
+                                    if(!object.get("Temperature").isJsonNull()) {
+                                        temperature.setText(object.get("Temperature").getAsString() + " F");
+                                    }
+
+                                    if(!object.get("Humidity").isJsonNull()) {
+                                        humidity.setText(object.get("Humidity").getAsString() + "%");
+                                    }
+
+                                    if(!object.get("Luminance").isJsonNull()) {
+                                        light.setText(object.get("Luminance").getAsString() + " lux");
+                                    }
+
+//                            sleepDuration.setText(summary.get("totalTimeInBed").getAsString());
+//                            co2Level.setText(esData.get("CO2Level").getAsString() + " ppm");
+                                } else {
+                                    String noData = "No data received";
+                                    sleepDuration.setText(noData);
+                                    temperature.setText(noData);
+                                    humidity.setText(noData);
+                                    light.setText(noData);
+                                    co2Level.setText(noData);
+                                }
+                            }
+                        }
+                    });
+        }
+
     }
 
 }
