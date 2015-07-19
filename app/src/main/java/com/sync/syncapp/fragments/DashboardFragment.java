@@ -203,8 +203,6 @@ public class DashboardFragment extends Fragment {
                                         }
                                     }
 
-//                            sleepDuration.setText(summary.get("totalTimeInBed").getAsString());
-//                            co2Level.setText(esData.get("CO2Level").getAsString() + " ppm");
                                 } else {
                                     String noData = "No data received";
                                     sleepDuration.setText(noData);
