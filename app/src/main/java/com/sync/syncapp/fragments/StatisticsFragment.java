@@ -31,6 +31,7 @@ import com.koushikdutta.ion.Ion;
 import com.sync.syncapp.Constants;
 import com.sync.syncapp.R;
 import com.sync.syncapp.model.Account;
+import com.sync.syncapp.model.Data;
 import com.sync.syncapp.model.Person;
 import com.sync.syncapp.model.Room;
 import com.sync.syncapp.util.AccountHandler;
@@ -39,7 +40,12 @@ import com.sync.syncapp.util.ApiWrapper;
 import java.lang.reflect.Array;
 import java.security.cert.LDAPCertStoreParameters;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -62,7 +68,6 @@ public class StatisticsFragment extends Fragment {
     TextView status;
     ProgressBar progress;
     
-//    String[] roomNames, roomIds;
     List<Room> rooms;
     String currentRoomId = "";
     
@@ -233,6 +238,208 @@ public class StatisticsFragment extends Fragment {
     }
 
     /**
+     * 
+     * @param params JsonElements for esData and sleep data, in that order
+     */
+    protected void parse(JsonElement... params) {
+        HashMap<String, List<Data>> data = new HashMap<>();
+        
+        //Parse the environmental data
+        Log.d(Constants.TAG, "starting to parse the environmental data");
+        JsonObject esData = params[0].getAsJsonObject();
+        
+        JsonArray result = esData.get("Result").getAsJsonArray();
+        int esSize = result.size();
+        if(esSize > 0) {
+            for(int i = 0; i < esSize; i++) {
+                JsonObject datapoint = result.get(i).getAsJsonObject();
+                
+                String timestamp = datapoint.get("Timestamp").getAsString();
+                String date = timestamp.split(" ")[0]; // assuming format YYYY-MM-DD hh:mm:ss
+
+                List<Data> values = data.get(date);
+                if(values == null) {
+                    values = new ArrayList<>();
+                    data.put(date, values);
+                }
+                
+                boolean changed = false;
+
+                if(co2Toggled) {
+                    if(!datapoint.get("CO2Level").isJsonNull()) {
+                        String co2Level = datapoint.get("CO2Level").getAsString();
+                        values.add(new Data(timestamp, co2Level, Data.DATA_TYPE_CO2));
+                        changed = true;
+                    }
+                }
+                
+                if(tempToggled) {
+                    if(!datapoint.get("Temperature").isJsonNull()) {
+                        String temperature = datapoint.get("Temperature").getAsString();
+                        values.add(new Data(timestamp, temperature, Data.DATA_TYPE_TEMP));
+                        changed = true;
+                    }
+                }
+                
+                if(lightToggled) {
+                    if(!datapoint.get("Luminance").isJsonNull()) {
+                        String light = datapoint.get("Luminance").getAsString();
+                        values.add(new Data(timestamp, light, Data.DATA_TYPE_LIGHT));
+                        changed = true;
+                    }
+                }
+                
+                if(changed)
+                    data.put(date, values);
+            }
+        }
+        
+        // Parse the sleep data
+        Log.d(Constants.TAG, "Starting to parse the sleep data");
+        JsonArray sleepData = params[1].getAsJsonArray();
+        int sleepDataSize = sleepData.size();
+        if(sleepDataSize > 0) {
+            for(int i = 0; i < sleepDataSize; i++) {
+                JsonObject sleepObject = sleepData.get(i).getAsJsonObject();
+                
+                JsonArray sleepValues = sleepObject.get("sleep").getAsJsonArray();
+                int sleepValuesSize = sleepValues.size();
+                for(int j=0; j < sleepValuesSize; j++) {
+                    JsonObject tmp = sleepValues.get(j).getAsJsonObject();
+                    
+                    String dateOfSleep = tmp.get("dateOfSleep").getAsString();
+                    
+                    List<Data> values = data.get(dateOfSleep);
+                    if(values == null) {
+                        values = new ArrayList<>();
+                        data.put(dateOfSleep, values);
+                    }
+                    
+                    JsonElement e = tmp.get("minuteData");
+                    if(!e.isJsonNull()) {
+                        JsonArray minuteData = e.getAsJsonArray();
+                        int minuteDataSize = minuteData.size();
+                        for (int k = 0; k < minuteDataSize; k++) {
+                            JsonObject minuteValue = minuteData.get(k).getAsJsonObject();
+
+                            String value = minuteValue.get("value").getAsString();
+                            String dateTime = minuteValue.get("dateTime").getAsString();
+
+                            String timestamp = dateOfSleep + " " + dateTime; // Should be in the form YYYY-MM-DD hh:mm:ss
+                            
+//                            Log.d(Constants.TAG, "sleep timestamp: " + timestamp);
+
+                            values.add(new Data(timestamp, value, Data.DATA_TYPE_SLEEP));
+                        }
+
+                        data.put(dateOfSleep, values);
+                    }
+                }
+            }
+        }
+        
+        // Put all this together and graph it
+        Log.d(Constants.TAG, "starting to graph the values");
+        ArrayList<Entry> co2Entries = new ArrayList<>();
+        ArrayList<Entry> tempEntries = new ArrayList<>();
+        ArrayList<Entry> lightEntries = new ArrayList<>();
+        ArrayList<Entry> sleepEntries = new ArrayList<>();
+        
+        ArrayList<String> xVals = new ArrayList<>();
+        
+        Set<String> keySet = data.keySet();
+        String[] keys = new String[keySet.size()];
+        keySet.toArray(keys);
+        Arrays.sort(keys);
+
+        int size = keys.length;
+        for(int i = 0; i < size; i++) {
+            List<Data> listOfData = data.get(keys[i]);
+            Collections.sort(listOfData);
+            
+            int listSize = listOfData.size();
+            for(int j = 0; j < listSize; j++) {
+                Data data1 = listOfData.get(j);
+                
+                Entry entry = new Entry(data1.getValueFloat(), j);
+                Entry blank = new Entry(0, j);
+                
+                if(data1.getDataType() == Data.DATA_TYPE_CO2) {
+                    co2Entries.add(entry);
+                    tempEntries.add(blank);
+                    lightEntries.add(blank);
+                    sleepEntries.add(blank);
+                } else if(data1.getDataType() == Data.DATA_TYPE_LIGHT) {
+                    co2Entries.add(blank);
+                    tempEntries.add(blank);
+                    lightEntries.add(entry);
+                    sleepEntries.add(blank);
+                } else if(data1.getDataType() == Data.DATA_TYPE_TEMP) {
+                    co2Entries.add(blank);
+                    tempEntries.add(entry);
+                    lightEntries.add(blank);
+                    sleepEntries.add(blank);
+                } else if(data1.getDataType() == Data.DATA_TYPE_SLEEP) {
+                    co2Entries.add(blank);
+                    tempEntries.add(blank);
+                    lightEntries.add(blank);
+                    sleepEntries.add(entry);
+                }
+                
+                xVals.add(data1.getTimestamp().toString());
+            }
+        }
+
+        ArrayList<LineDataSet> dataSets = new ArrayList<>();
+        
+        if(co2Entries.size() > 0) {
+            LineDataSet co2DataSet = new LineDataSet(co2Entries, "CO2");
+            co2DataSet.setColor(getResources().getColor(R.color.color_co2));
+            co2DataSet.setCircleColor(getResources().getColor(R.color.color_co2));
+            co2DataSet.setCircleColorHole(getResources().getColor(R.color.color_co2));
+            dataSets.add(co2DataSet);
+        }
+        
+        if(lightEntries.size() > 0) {
+            LineDataSet lightDataSet = new LineDataSet(lightEntries, "Light");
+            lightDataSet.setColor(getResources().getColor(R.color.color_light));
+            lightDataSet.setCircleColor(getResources().getColor(R.color.color_light));
+            lightDataSet.setCircleColorHole(getResources().getColor(R.color.color_light));
+        }
+        
+        if(tempEntries.size() > 0) {
+            LineDataSet tempDataSet = new LineDataSet(tempEntries, "Temperature");
+            tempDataSet.setColor(getResources().getColor(R.color.color_temp));
+            tempDataSet.setCircleColor(getResources().getColor(R.color.color_temp));
+            tempDataSet.setCircleColorHole(getResources().getColor(R.color.color_temp));
+            dataSets.add(tempDataSet);
+        }
+        
+        if(sleepEntries.size() > 0) {
+            LineDataSet sleepDataSet = new LineDataSet(sleepEntries, "Sleep");
+            sleepDataSet.setColor(getResources().getColor(R.color.color_sleep));
+            sleepDataSet.setCircleColor(getResources().getColor(R.color.color_sleep));
+            sleepDataSet.setCircleColorHole(getResources().getColor(R.color.color_sleep));
+            dataSets.add(sleepDataSet);
+        }
+
+        LineData lineData = new LineData(xVals, dataSets);
+        chart.setData(lineData);
+
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.d(Constants.TAG, "invalidating chart and making visible");
+                chart.invalidate();
+                
+                chart.setVisibility(View.VISIBLE);
+                progress.setVisibility(View.INVISIBLE);
+                status.setVisibility(View.INVISIBLE);
+            }
+        });
+    }
+
+    /**
      * Pass the ESData as the first parameter and the sleep data as the second
      */
     private class UpdateGraphTask extends AsyncTask<JsonElement, Void, Void> {
@@ -240,156 +447,12 @@ public class StatisticsFragment extends Fragment {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    Log.d(Constants.TAG, "making the progress bar visible");
                     progress.setVisibility(View.VISIBLE);
                 }
             });
-
-            ArrayList<Entry> co2Data = new ArrayList<>();
-            ArrayList<Entry> tempData = new ArrayList<>();
-            ArrayList<Entry> lightData = new ArrayList<>();
-            ArrayList<Entry> sleepData = new ArrayList<>();
             
-            ArrayList<String> dates = new ArrayList<>();
-            
-            JsonObject esData = params[0].getAsJsonObject();
-            
-            JsonArray result = esData.getAsJsonArray("Result");
-            int size = result.size();
-            if(size > 0) {
-                for(int i = 0; i < size; i++) {
-                    JsonObject datapoint = result.get(i).getAsJsonObject();
-                    
-                    String timestamp = datapoint.get("Timestamp").getAsString();
-                    boolean changed = false;
-                    
-                    //Get the CO2 data if the user wants it
-                    if(co2Toggled) {
-                        if(datapoint.has("CO2Level") && !datapoint.get("CO2Level").isJsonNull()) {
-                            co2Data.add(new Entry(
-                                    Float.valueOf(datapoint.get("CO2Level").getAsString()), 
-                                    i
-                            ));
-                            changed = true;
-                        }
-                    }
-                    
-                    //Get the light data if the user wants it
-                    if(lightToggled) {
-                        if(datapoint.has("Luminance") && !datapoint.get("Luminance").isJsonNull()) {
-                            lightData.add(new Entry(
-                                    Float.valueOf(datapoint.get("Luminance").getAsString()),
-                                    i
-                            ));
-                            changed = true;
-                        }
-                    }
-                    
-                    //Get the temperature data if the user wants it
-                    if(tempToggled) {
-                        if(datapoint.has("Temperature")) {
-                            tempData.add(new Entry(
-                                    Float.valueOf(datapoint.get("Temperature").getAsString()),
-                                    i
-                            ));
-                            changed = true;
-                        }
-                    }
-                    
-                    if(changed) {
-                        dates.add(timestamp);
-                    }
-                }
-            }
-            
-            JsonArray sleepJson = params[1].getAsJsonArray();
-            
-            //TODO: create a data set for sleep data and plot on graph
-            int sleepSize = sleepJson.size();
-            if(sleepSize > 0) {
-                for(int i=0; i < sleepSize; i++) {
-                    JsonObject dp = sleepJson.get(i).getAsJsonObject();
-                    JsonArray sleep = dp.get("sleep").getAsJsonArray();
-                    if(sleep.size() > 0) {
-                        JsonObject s = sleep.get(0).getAsJsonObject(); // Get First sleep data
-                        
-                        String date = s.get("dateOfSleep").getAsString();
-                        
-                        JsonElement minuteDataTmp = s.get("minuteData");
-                        if(!minuteDataTmp.isJsonNull()) {
-                            JsonArray minuteData = minuteDataTmp.getAsJsonArray();
-                            int minuteSize = minuteData.size();
-
-                            if(minuteSize > 0) {
-                                for(int j=0; j<minuteSize; j++) {
-                                    JsonObject minute = minuteData.get(j).getAsJsonObject();
-
-                                    String dateTime = minute.get("dateTime").getAsString();
-                                    String value = minute.get("value").getAsString();
-
-                                    sleepData.add(new Entry(
-                                            Float.valueOf(value),
-                                            j
-                                    ));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            
-            ArrayList<LineDataSet> dataSets = new ArrayList<>();
-            
-            LineDataSet co2DataSet;
-            LineDataSet tempDataSet;
-            LineDataSet lightDataSet;
-            LineDataSet sleepDataSet;
-            
-            if(co2Data.size() > 0) {
-                co2DataSet = new LineDataSet(co2Data, "CO2");
-                co2DataSet.setColor(getResources().getColor(R.color.color_co2));
-                co2DataSet.setCircleColor(getResources().getColor(R.color.color_co2));
-                co2DataSet.setCircleColorHole(getResources().getColor(R.color.color_co2));
-                dataSets.add(co2DataSet);
-            }
-            
-            if(tempData.size() > 0) {
-                tempDataSet = new LineDataSet(tempData, "Temp");
-                tempDataSet.setColor(getResources().getColor(R.color.color_temp));
-                tempDataSet.setCircleColor(getResources().getColor(R.color.color_temp));
-                tempDataSet.setCircleColorHole(getResources().getColor(R.color.color_temp));
-                dataSets.add(tempDataSet);
-            }
-            
-            if(lightData.size() > 0) {
-                lightDataSet = new LineDataSet(lightData, "Light");
-                lightDataSet.setColor(getResources().getColor(R.color.color_light));
-                lightDataSet.setCircleColor(getResources().getColor(R.color.color_light));
-                lightDataSet.setCircleColorHole(getResources().getColor(R.color.color_light));
-                dataSets.add(lightDataSet);
-            }
-            
-            sleepDataSet = new LineDataSet(sleepData, "Sleep");
-            sleepDataSet.setColor(getResources().getColor(R.color.color_sleep));
-            sleepDataSet.setCircleColor(getResources().getColor(R.color.color_sleep));
-            sleepDataSet.setCircleColorHole(getResources().getColor(R.color.color_sleep));
-            dataSets.add(sleepDataSet);
-            
-            // TODO: align sleep data and es data x-values
-            LineData data = new LineData(dates, dataSets);
-            
-            chart.setData(data);
-            
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    chart.invalidate();
-                    
-                    status.setVisibility(View.INVISIBLE);
-                    chart.setVisibility(View.VISIBLE);
-                    
-                    progress.setVisibility(View.INVISIBLE);
-                }
-            });
+            parse(params);
             return null;
         }
     }
