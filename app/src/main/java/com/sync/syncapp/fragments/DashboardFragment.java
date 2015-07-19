@@ -136,6 +136,8 @@ public class DashboardFragment extends Fragment {
                                 Log.d(Constants.TAG, "populating the dropdown");
                                 ArrayAdapter<Room> adapter = new ArrayAdapter<>(context, R.layout.spinner_item, rooms);
                                 roomDropdown.setAdapter(adapter);
+                                
+                                
                             } else {
                                 rooms = new ArrayList<>();
                                 Room noRoom = new Room();
@@ -145,43 +147,6 @@ public class DashboardFragment extends Fragment {
                                 roomDropdown.setAdapter(adapter);
                             }
 
-                        }
-                    }
-                });
-        
-        Ion.with(context)
-                .load(Constants.API + "/api/PSDataByFitBitUser/3GTVKM")
-                .setHeader(Constants.AUTH_KEY, Constants.AUTH_VALUE)
-                .asJsonArray()
-                .setCallback(new FutureCallback<JsonArray>() {
-                    @Override
-                    public void onCompleted(Exception e, JsonArray result) {
-                        if(e != null) {
-                            Log.e(Constants.TAG, "error getting fitbit data for dashboard", e);
-                            return;
-                        }
-                        if(result != null) {
-                            Log.d(Constants.TAG, "got result " + result);
-                            int size = result.size();
-                            if(size > 0) {
-                                JsonObject lastSleep = result.get(size - 1).getAsJsonObject();
-                                JsonObject summary = lastSleep.get("summary").getAsJsonObject();
-                                
-                                String minutesAsleep = summary.get("totalMinutesAsleep").getAsString();
-                                
-                                int hours = 0;
-                                int minutes = 0;
-                                
-                                int remaining = Integer.valueOf(minutesAsleep);
-                                while(remaining - 60 >= 0) {
-                                    remaining -= 60;
-                                    hours++;
-                                }
-                                minutes += remaining;
-                                
-                                String duration = hours + " hrs " + minutes + " min";
-                                sleepDuration.setText(duration);
-                            }
                         }
                     }
                 });
@@ -204,26 +169,38 @@ public class DashboardFragment extends Fragment {
                     .setCallback(new FutureCallback<JsonObject>() {
                         @Override
                         public void onCompleted(Exception e, JsonObject array) {
-                            if(e != null) {
+                            if (e != null) {
                                 Log.e(Constants.TAG, "error fetching es data in Dashboard", e);
                                 return;
                             }
-                            if(array != null) {
+                            if (array != null) {
                                 JsonArray result = array.get("Result").getAsJsonArray();
                                 int size = result.size();
                                 if (size > 0) {
                                     JsonObject object = result.get(size - 1).getAsJsonObject();
 
-                                    if(!object.get("Temperature").isJsonNull()) {
+                                    if (!object.get("Temperature").isJsonNull()) {
                                         temperature.setText(object.get("Temperature").getAsString() + " F");
                                     }
 
-                                    if(!object.get("Humidity").isJsonNull()) {
+                                    if (!object.get("Humidity").isJsonNull()) {
                                         humidity.setText(object.get("Humidity").getAsString() + "%");
                                     }
 
-                                    if(!object.get("Luminance").isJsonNull()) {
+                                    if (!object.get("Luminance").isJsonNull()) {
                                         light.setText(object.get("Luminance").getAsString() + " lux");
+                                    }
+
+                                    int j = size - 1;
+                                    while (j >= 0 && !result.get(j).isJsonNull()) {
+                                        JsonObject co2 = result.get(j).getAsJsonObject();
+                                        
+                                        if(!co2.get("CO2Level").isJsonNull()) {
+                                            co2Level.setText(co2.get("CO2Level").getAsString());
+                                            break;
+                                        } else {
+                                            j -= 1;
+                                        }
                                     }
 
 //                            sleepDuration.setText(summary.get("totalTimeInBed").getAsString());
@@ -235,6 +212,43 @@ public class DashboardFragment extends Fragment {
                                     humidity.setText(noData);
                                     light.setText(noData);
                                     co2Level.setText(noData);
+                                }
+                            }
+                        }
+                    });
+
+            Ion.with(getActivity().getApplicationContext())
+                    .load(Constants.API + "/api/PSDataByFitBitUser/3GTVKM")
+                    .setHeader(Constants.AUTH_KEY, Constants.AUTH_VALUE)
+                    .asJsonArray()
+                    .setCallback(new FutureCallback<JsonArray>() {
+                        @Override
+                        public void onCompleted(Exception e, JsonArray result) {
+                            if (e != null) {
+                                Log.e(Constants.TAG, "error getting fitbit data for dashboard", e);
+                                return;
+                            }
+                            if (result != null) {
+                                Log.d(Constants.TAG, "got result " + result);
+                                int size = result.size();
+                                if (size > 0) {
+                                    JsonObject lastSleep = result.get(size - 1).getAsJsonObject();
+                                    JsonObject summary = lastSleep.get("summary").getAsJsonObject();
+
+                                    String minutesAsleep = summary.get("totalMinutesAsleep").getAsString();
+
+                                    int hours = 0;
+                                    int minutes = 0;
+
+                                    int remaining = Integer.valueOf(minutesAsleep);
+                                    while (remaining - 60 >= 0) {
+                                        remaining -= 60;
+                                        hours++;
+                                    }
+                                    minutes += remaining;
+
+                                    String duration = hours + " hrs " + minutes + " min";
+                                    sleepDuration.setText(duration);
                                 }
                             }
                         }
