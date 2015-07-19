@@ -36,6 +36,7 @@ import com.sync.syncapp.model.Room;
 import com.sync.syncapp.util.AccountHandler;
 import com.sync.syncapp.util.ApiWrapper;
 
+import java.lang.reflect.Array;
 import java.security.cert.LDAPCertStoreParameters;
 import java.util.ArrayList;
 import java.util.List;
@@ -246,6 +247,7 @@ public class StatisticsFragment extends Fragment {
             ArrayList<Entry> co2Data = new ArrayList<>();
             ArrayList<Entry> tempData = new ArrayList<>();
             ArrayList<Entry> lightData = new ArrayList<>();
+            ArrayList<Entry> sleepData = new ArrayList<>();
             
             ArrayList<String> dates = new ArrayList<>();
             
@@ -299,14 +301,39 @@ public class StatisticsFragment extends Fragment {
                 }
             }
             
-            JsonArray sleepData = params[1].getAsJsonArray();
+            JsonArray sleepJson = params[1].getAsJsonArray();
             
             //TODO: create a data set for sleep data and plot on graph
-            int sleepSize = sleepData.size();
+            int sleepSize = sleepJson.size();
             if(sleepSize > 0) {
                 for(int i=0; i < sleepSize; i++) {
-                    JsonObject dp = sleepData.get(i).getAsJsonObject();
+                    JsonObject dp = sleepJson.get(i).getAsJsonObject();
                     JsonArray sleep = dp.get("sleep").getAsJsonArray();
+                    if(sleep.size() > 0) {
+                        JsonObject s = sleep.get(0).getAsJsonObject(); // Get First sleep data
+                        
+                        String date = s.get("dateOfSleep").getAsString();
+                        
+                        JsonElement minuteDataTmp = s.get("minuteData");
+                        if(!minuteDataTmp.isJsonNull()) {
+                            JsonArray minuteData = minuteDataTmp.getAsJsonArray();
+                            int minuteSize = minuteData.size();
+
+                            if(minuteSize > 0) {
+                                for(int j=0; j<minuteSize; j++) {
+                                    JsonObject minute = minuteData.get(j).getAsJsonObject();
+
+                                    String dateTime = minute.get("dateTime").getAsString();
+                                    String value = minute.get("value").getAsString();
+
+                                    sleepData.add(new Entry(
+                                            Float.valueOf(value),
+                                            j
+                                    ));
+                                }
+                            }
+                        }
+                    }
                 }
             }
             
@@ -315,6 +342,7 @@ public class StatisticsFragment extends Fragment {
             LineDataSet co2DataSet;
             LineDataSet tempDataSet;
             LineDataSet lightDataSet;
+            LineDataSet sleepDataSet;
             
             if(co2Data.size() > 0) {
                 co2DataSet = new LineDataSet(co2Data, "CO2");
@@ -339,7 +367,14 @@ public class StatisticsFragment extends Fragment {
                 lightDataSet.setCircleColorHole(getResources().getColor(R.color.color_light));
                 dataSets.add(lightDataSet);
             }
-
+            
+            sleepDataSet = new LineDataSet(sleepData, "Sleep");
+            sleepDataSet.setColor(getResources().getColor(R.color.color_sleep));
+            sleepDataSet.setCircleColor(getResources().getColor(R.color.color_sleep));
+            sleepDataSet.setCircleColorHole(getResources().getColor(R.color.color_sleep));
+            dataSets.add(sleepDataSet);
+            
+            // TODO: align sleep data and es data x-values
             LineData data = new LineData(dates, dataSets);
             
             chart.setData(data);
