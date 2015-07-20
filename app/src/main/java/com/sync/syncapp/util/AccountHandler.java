@@ -52,8 +52,7 @@ public class AccountHandler {
     }
 
     public void addAccount(UserProfile profile) {
-        String id = profile.getId();
-        String user_id = id; //one of these is possible unnecessary
+        String user_id = profile.getId().split("|")[1]; //remove the provider
         setUserId(user_id);
         String connection = "";
         String email = profile.getEmail();
@@ -77,7 +76,6 @@ public class AccountHandler {
 //         }
 
         JsonObject json = new JsonObject();
-        json.addProperty("id", id);
         json.addProperty("user_id", user_id);
         json.addProperty("connection", connection);
         json.addProperty("email", email);
