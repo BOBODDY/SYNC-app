@@ -52,7 +52,7 @@ public class AccountHandler {
     }
 
     public void addAccount(UserProfile profile) {
-        String user_id = profile.getId().split("|")[1]; //remove the provider
+        String user_id = profile.getId().split("\\|")[1]; //remove the provider
         setUserId(user_id);
         String connection = "";
         String email = profile.getEmail();
