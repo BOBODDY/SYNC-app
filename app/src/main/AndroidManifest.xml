@@ -27,7 +27,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        
+
         <!-- Auth0 Lock -->
         <activity
             android:name="com.auth0.lock.LockActivity"
@@ -50,7 +50,7 @@
                     android:scheme="a0alttxsbjkw4xpnjpvtpm4icxhhkl5b1y" />
             </intent-filter>
         </activity>
-        
+
         <meta-data
             android:name="com.auth0.lock.client-id"
             android:value="AlTtxsbJkW4xPNjPvTPm4iCxHhkl5B1y" />
@@ -135,7 +135,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        
+
         <!-- RoomsActivity -->
         <activity
             android:name=".activities.RoomsActivity"
@@ -147,6 +147,35 @@
 
             <intent-filter>
                 <action android:name=".activities.RoomsActivity" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        
+        <activity
+            android:name=".activities.ESensorsActivity"
+            android:label="@string/title_activity_esensors" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.sync.syncapp.activities.MainActivity" />
+
+            <intent-filter>
+                <action android:name=".activities.ESensorsActivity" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        
+        <activity
+            android:name=".activities.PSensorsActivity"
+            android:label="@string/title_activity_psensors"
+            android:parentActivityName=".activities.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.sync.syncapp.activities.MainActivity" />
+
+            <intent-filter>
+                <action android:name=".activities.PSensorsActivity" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>

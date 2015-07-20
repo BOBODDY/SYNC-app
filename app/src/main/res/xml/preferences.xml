@@ -9,12 +9,12 @@
         <intent android:action=".activities.RoomsActivity" />
     </Preference>
     
-    <Preference android:title="@string/add_esensor">
-        <intent android:action=".activities.AddESensorActivity" />
+    <Preference android:title="@string/esensors">
+        <intent android:action=".activities.ESensorsActivity" />
     </Preference>
     
-    <Preference android:title="@string/add_fitbit">
-        <intent android:action=".activities.AddFitbitActivity" />
+    <Preference android:title="@string/psensors">
+        <intent android:action=".activities.PSensorsActivity" />
     </Preference>
     
 </PreferenceScreen>

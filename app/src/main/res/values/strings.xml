@@ -78,6 +78,14 @@
     <!-- Rooms strings -->
     <string name="rooms">Rooms</string>
     <string name="roomsAccount">Rooms on your account</string>
+    
+    <!-- ESensors strings -->
+    <string name="esensors">Environmental Sensors</string>
+    <string name="esensorsAccount"> Sensors on your account</string>
+    
+    <!-- PSensors strings -->
+    <string name="psensors">Personal Sensors</string>
+    <string name="psensorsAccount">Sensors on you account</string>
 
     <string name="title_activity_add_user">Add User</string>
     <string name="title_activity_add_room">Add Room</string>
@@ -85,5 +93,7 @@
     <string name="title_activity_add_person">Add Person</string>
     <string name="title_activity_add_esensor">Add Environmental Sensor</string>
     <string name="title_activity_people">People</string>
-    <string name="title_activity_rooms">RoomsActivity</string>
+    <string name="title_activity_rooms">Rooms</string>
+    <string name="title_activity_esensors">Environmental Sensors</string>
+    <string name="title_activity_psensors">Personal Sensors</string>
 </resources>
