@@ -136,6 +136,19 @@ public class DashboardFragment extends Fragment {
                                 Log.d(Constants.TAG, "populating the dropdown");
                                 ArrayAdapter<Room> adapter = new ArrayAdapter<>(context, R.layout.spinner_item, rooms);
                                 roomDropdown.setAdapter(adapter);
+                                
+                                    String roomName = room.get("RoomType").getAsString();
+                                    String roomId = room.get("id").getAsString();
+                                
+                                    Room newRoom = new Room(account, new Person(account, ""), "", roomName, "");
+                                    newRoom.setId(roomId);
+
+                                    rooms.add(newRoom);
+                                }
+
+                                Log.d(Constants.TAG, "populating the dropdown");
+                                ArrayAdapter<Room> adapter = new ArrayAdapter<>(context, R.layout.spinner_item, rooms);
+                                roomDropdown.setAdapter(adapter);
                             } else {
                                 rooms = new ArrayList<>();
                                 Room noRoom = new Room();
@@ -191,6 +204,7 @@ public class DashboardFragment extends Fragment {
 
 //                            sleepDuration.setText(summary.get("totalTimeInBed").getAsString());
 //                            co2Level.setText(esData.get("CO2Level").getAsString() + " ppm");
+
                                 } else {
                                     String noData = "No data received";
                                     sleepDuration.setText(noData);
@@ -202,8 +216,45 @@ public class DashboardFragment extends Fragment {
                             }
                         }
                     });
+
+            Ion.with(getActivity().getApplicationContext())
+                    .load(Constants.API + "/api/PSDataByFitBitUser/3GTVKM")
+                    .setHeader(Constants.AUTH_KEY, Constants.AUTH_VALUE)
+                    .asJsonArray()
+                    .setCallback(new FutureCallback<JsonArray>() {
+                        @Override
+                        public void onCompleted(Exception e, JsonArray result) {
+                            if (e != null) {
+                                Log.e(Constants.TAG, "error getting fitbit data for dashboard", e);
+                                return;
+                            }
+                            if (result != null) {
+                                Log.d(Constants.TAG, "got result " + result);
+                                int size = result.size();
+                                if (size > 0) {
+                                    JsonObject lastSleep = result.get(size - 1).getAsJsonObject();
+                                    JsonObject summary = lastSleep.get("summary").getAsJsonObject();
+
+                                    String minutesAsleep = summary.get("totalMinutesAsleep").getAsString();
+
+                                    int hours = 0;
+                                    int minutes = 0;
+
+                                    int remaining = Integer.valueOf(minutesAsleep);
+                                    while (remaining - 60 >= 0) {
+                                        remaining -= 60;
+                                        hours++;
+                                    }
+                                    minutes += remaining;
+
+                                    String duration = hours + " hrs " + minutes + " min";
+                                    sleepDuration.setText(duration);
+                                }
+                            }
+                        }
+                    });
         }
-        
+
     }
 
 }

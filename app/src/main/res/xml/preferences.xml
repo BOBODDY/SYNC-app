@@ -1,23 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <Preference android:title="@string/add_user">
-        <intent android:action=".activities.AddUserActivity" />
-    </Preference>
-
-    <Preference android:title="@string/add_fitbit">
-        <intent android:action=".activities.AddFitbitActivity" />
-    </Preference>
-
-    <Preference android:title="@string/add_esensor">
-        <intent android:action=".activities.AddESensorActivity" />
-    </Preference>
-
-    <Preference android:title="@string/add_room">
-        <intent android:action=".activities.AddRoomActivity" />
-    </Preference>
-
+    
     <Preference android:title="@string/add_person">
         <intent android:action=".activities.AddPersonActivity" />
     </Preference>
+    
+    <Preference android:title="@string/add_room">
+        <intent android:action=".activities.AddRoomActivity" />
+    </Preference>
+    
+    <Preference android:title="@string/add_esensor">
+        <intent android:action=".activities.AddESensorActivity" />
+    </Preference>
+    
+    <Preference android:title="@string/add_fitbit">
+        <intent android:action=".activities.AddFitbitActivity" />
+    </Preference>
+    
 </PreferenceScreen>
