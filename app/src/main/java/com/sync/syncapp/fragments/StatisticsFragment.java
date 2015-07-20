@@ -19,6 +19,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.DataSet;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
@@ -351,18 +352,19 @@ public class StatisticsFragment extends Fragment {
         String[] keys = new String[keySet.size()];
         keySet.toArray(keys);
         Arrays.sort(keys);
-
+        
+        int indexx = 0; // typo = sexy index
         int size = keys.length;
         for(int i = 0; i < size; i++) {
             List<Data> listOfData = data.get(keys[i]);
             Collections.sort(listOfData);
             
             int listSize = listOfData.size();
-            for(int j = 0; j < listSize; j++) {
+            for(int j = 0; j < listSize; j++, indexx++) {
                 Data data1 = listOfData.get(j);
                 
-                Entry entry = new Entry(data1.getValueFloat(), j);
-                Entry blank = new Entry(0, j);
+                Entry entry = new Entry(data1.getValueFloat(), indexx);
+                Entry blank = new Entry(0, indexx);
                 
                 if(data1.getDataType() == Data.DATA_TYPE_CO2) {
                     co2Entries.add(entry);
@@ -405,6 +407,7 @@ public class StatisticsFragment extends Fragment {
             lightDataSet.setColor(getResources().getColor(R.color.color_light));
             lightDataSet.setCircleColor(getResources().getColor(R.color.color_light));
             lightDataSet.setCircleColorHole(getResources().getColor(R.color.color_light));
+            dataSets.add(lightDataSet);
         }
         
         if(tempEntries.size() > 0) {
@@ -420,6 +423,7 @@ public class StatisticsFragment extends Fragment {
             sleepDataSet.setColor(getResources().getColor(R.color.color_sleep));
             sleepDataSet.setCircleColor(getResources().getColor(R.color.color_sleep));
             sleepDataSet.setCircleColorHole(getResources().getColor(R.color.color_sleep));
+            sleepDataSet.setAxisDependency(YAxis.AxisDependency.RIGHT);
             dataSets.add(sleepDataSet);
         }
 
