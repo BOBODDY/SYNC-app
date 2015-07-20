@@ -27,10 +27,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <!-- AddUserActivity -->
-
-
+        
         <!-- Auth0 Lock -->
         <activity
             android:name="com.auth0.lock.LockActivity"
@@ -44,22 +41,22 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="boboddy.auth0.com"
-                    android:scheme="a0sutttilZfWs0l2Y2NAFq9fdj8AKdkzKZ" />
+                    android:host="yenhuang.auth0.com"
+                    android:scheme="a0AlTtxsbJkW4xPNjPvTPm4iCxHhkl5B1y" />
 
                 <!-- Why the hell does it send back a lowercase version?!? -->
                 <data
-                    android:host="boboddy.auth0.com"
-                    android:scheme="a0sutttilzfws0l2y2nafq9fdj8akdkzkz" />
+                    android:host="yenhuang.auth0.com"
+                    android:scheme="a0alttxsbjkw4xpnjpvtpm4icxhhkl5b1y" />
             </intent-filter>
         </activity>
-
+        
         <meta-data
             android:name="com.auth0.lock.client-id"
-            android:value="sutttilZfWs0l2Y2NAFq9fdj8AKdkzKZ" />
+            android:value="AlTtxsbJkW4xPNjPvTPm4iCxHhkl5B1y" />
         <meta-data
             android:name="com.auth0.lock.domain-url"
-            android:value="boboddy.auth0.com" />
+            android:value="yenhuang.auth0.com" />
         <!-- Auth0 Lock End -->
 
 
