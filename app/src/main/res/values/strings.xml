@@ -60,6 +60,16 @@
     <string name="toggle_co2">CO2</string>
     <string name="toggle_temp">Temp</string>
     <string name="toggle_light">Light</string>
+    <string name="days"># days to show</string>
+    <string-array name="day_options">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+    </string-array>
     
     <!-- People strings -->
     <string name="people">People</string>

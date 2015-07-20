@@ -68,6 +68,7 @@ public class StatisticsFragment extends Fragment {
     Spinner roomDropdown;
     TextView status;
     ProgressBar progress;
+    Spinner daysDropdown;
 
     List<Room> rooms;
     String currentRoomId = "";
@@ -75,6 +76,8 @@ public class StatisticsFragment extends Fragment {
     boolean co2Toggled;
     boolean tempToggled;
     boolean lightToggled;
+    
+    int n = 1; //The number of days to show
 
     /**
      * Use this factory method to create a new instance of
@@ -119,6 +122,21 @@ public class StatisticsFragment extends Fragment {
 
         progress = (ProgressBar) a.findViewById(R.id.stats_progress);
         progress.setVisibility(View.INVISIBLE);
+        
+        daysDropdown = (Spinner) a.findViewById(R.id.stats_days);
+        daysDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Log.d(Constants.TAG, "show " + position + " days in the graph");
+                n = position + 1;
+                updateGraph(currentRoomId);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
 
         roomDropdown = (Spinner) a.findViewById(R.id.stats_room_dropdown);
         roomDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -355,8 +373,6 @@ public class StatisticsFragment extends Fragment {
 
         int index = 0;
         int size = keys.length;
-
-        int n = 1;
 
         String[] lastNDays = new String[n];
         if(size >= 3) {

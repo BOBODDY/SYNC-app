@@ -6,7 +6,29 @@
         android:id="@+id/stats_room_dropdown"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"/>
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"/>
+
+    <Spinner
+        android:id="@+id/stats_days"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_gravity="end"
+        android:entries="@array/day_options"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_toLeftOf="@id/stats_days"
+        android:layout_toStartOf="@id/stats_days"
+        android:text="@string/days"/>
     
     <LinearLayout
         android:id="@+id/stats_checkbox_layout"
