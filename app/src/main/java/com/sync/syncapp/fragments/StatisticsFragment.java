@@ -19,6 +19,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.DataSet;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
@@ -31,14 +32,21 @@ import com.koushikdutta.ion.Ion;
 import com.sync.syncapp.Constants;
 import com.sync.syncapp.R;
 import com.sync.syncapp.model.Account;
+import com.sync.syncapp.model.Data;
 import com.sync.syncapp.model.Person;
 import com.sync.syncapp.model.Room;
 import com.sync.syncapp.util.AccountHandler;
 import com.sync.syncapp.util.ApiWrapper;
 
+import java.lang.reflect.Array;
 import java.security.cert.LDAPCertStoreParameters;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -46,13 +54,13 @@ import java.util.List;
  * create an instance of this fragment.
  */
 public class StatisticsFragment extends Fragment {
-    
+
     Context context;
-    
+
     AccountHandler handler;
     ApiWrapper apiWrapper;
     Account account;
-    
+
     CheckBox toggleCo2;
     CheckBox toggleTemp;
     CheckBox toggleLight;
@@ -60,11 +68,10 @@ public class StatisticsFragment extends Fragment {
     Spinner roomDropdown;
     TextView status;
     ProgressBar progress;
-    
-//    String[] roomNames, roomIds;
+
     List<Room> rooms;
     String currentRoomId = "";
-    
+
     boolean co2Toggled;
     boolean tempToggled;
     boolean lightToggled;
@@ -76,43 +83,43 @@ public class StatisticsFragment extends Fragment {
      * @return A new instance of fragment StatisticsFragment.
      */
     public static StatisticsFragment newInstance() { return new StatisticsFragment(); }
-    
+
     public StatisticsFragment() {}
-    
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
-    
+
     public void onStart() {
         super.onStart();
-        
+
         final Activity a = getActivity();
         context = a.getApplicationContext();
         handler = AccountHandler.newInstance(context);
         apiWrapper = ApiWrapper.newInstance(context, new Account(handler.getUserId()));
         account = new Account(handler.getUserId());
-        
+
         toggleCo2 = (CheckBox) a.findViewById(R.id.stats_toggle_co2);
         toggleCo2.setOnCheckedChangeListener(new ToggleCheckChangeListener());
         co2Toggled = toggleCo2.isChecked();
-        
+
         toggleTemp = (CheckBox) a.findViewById(R.id.stats_toggle_temp);
         toggleTemp.setOnCheckedChangeListener(new ToggleCheckChangeListener());
         tempToggled = toggleTemp.isChecked();
-        
+
         toggleLight = (CheckBox) a.findViewById(R.id.stats_toggle_light);
         toggleLight.setOnCheckedChangeListener(new ToggleCheckChangeListener());
         lightToggled = toggleLight.isChecked();
-        
+
         chart = (LineChart) a.findViewById(R.id.stats_chart);
         chart.setVisibility(View.INVISIBLE);
-        
+
         status = (TextView) a.findViewById(R.id.stats_status);
         status.setVisibility(View.VISIBLE);
-        
+
         progress = (ProgressBar) a.findViewById(R.id.stats_progress);
         progress.setVisibility(View.INVISIBLE);
-        
+
         roomDropdown = (Spinner) a.findViewById(R.id.stats_room_dropdown);
         roomDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -127,7 +134,7 @@ public class StatisticsFragment extends Fragment {
 
             }
         });
-        
+
 //        rooms = apiWrapper.getAccountRooms(); // I wish I could synchronize this
         rooms = new ArrayList<>();
         Ion.with(context)
@@ -166,7 +173,7 @@ public class StatisticsFragment extends Fragment {
                                 rooms = new ArrayList<>();
                                 Room noRoom = new Room();
                                 noRoom.setRoomType("No rooms added");
-                                
+
                                 ArrayAdapter<Room> adapter = new ArrayAdapter<>(context, R.layout.spinner_item, rooms);
                                 roomDropdown.setAdapter(adapter);
                             }
@@ -174,11 +181,11 @@ public class StatisticsFragment extends Fragment {
                         }
                     }
                 });
-        
+
         //TODO: get statistics and set up the line chart
         updateGraph("");
     }
-    
+
     private void updateGraph(final String roomId) {
         if(roomId.equals("")) { // No rooms have been added yet
             chart.setVisibility(View.INVISIBLE);
@@ -232,6 +239,219 @@ public class StatisticsFragment extends Fragment {
     }
 
     /**
+     *
+     * @param params JsonElements for esData and sleep data, in that order
+     */
+    protected void parse(JsonElement... params) {
+        HashMap<String, List<Data>> data = new HashMap<>();
+
+        //Parse the environmental data
+        Log.d(Constants.TAG, "starting to parse the environmental data");
+        JsonObject esData = params[0].getAsJsonObject();
+
+        JsonArray result = esData.get("Result").getAsJsonArray();
+        int esSize = result.size();
+        if(esSize > 0) {
+            for(int i = 0; i < esSize; i++) {
+                JsonObject datapoint = result.get(i).getAsJsonObject();
+
+                String timestamp = datapoint.get("Timestamp").getAsString();
+                String date = timestamp.split(" ")[0]; // assuming format YYYY-MM-DD hh:mm:ss
+
+                List<Data> values = data.get(date);
+                if(values == null) {
+                    values = new ArrayList<>();
+                    data.put(date, values);
+                }
+
+                boolean changed = false;
+
+                if(co2Toggled) {
+                    if(!datapoint.get("CO2Level").isJsonNull()) {
+                        String co2Level = datapoint.get("CO2Level").getAsString();
+                        values.add(new Data(timestamp, co2Level, Data.DATA_TYPE_CO2));
+                        changed = true;
+                    }
+                }
+
+                if(tempToggled) {
+                    if(!datapoint.get("Temperature").isJsonNull()) {
+                        String temperature = datapoint.get("Temperature").getAsString();
+                        values.add(new Data(timestamp, temperature, Data.DATA_TYPE_TEMP));
+                        changed = true;
+                    }
+                }
+
+                if(lightToggled) {
+                    if(!datapoint.get("Luminance").isJsonNull()) {
+                        String light = datapoint.get("Luminance").getAsString();
+                        values.add(new Data(timestamp, light, Data.DATA_TYPE_LIGHT));
+                        changed = true;
+                    }
+                }
+
+                if(changed)
+                    data.put(date, values);
+            }
+        }
+
+        // Parse the sleep data
+        Log.d(Constants.TAG, "Starting to parse the sleep data");
+        JsonArray sleepData = params[1].getAsJsonArray();
+        int sleepDataSize = sleepData.size();
+        if(sleepDataSize > 0) {
+            for(int i = 0; i < sleepDataSize; i++) {
+                JsonObject sleepObject = sleepData.get(i).getAsJsonObject();
+
+                JsonArray sleepValues = sleepObject.get("sleep").getAsJsonArray();
+                int sleepValuesSize = sleepValues.size();
+                for(int j=0; j < sleepValuesSize; j++) {
+                    JsonObject tmp = sleepValues.get(j).getAsJsonObject();
+
+                    String dateOfSleep = tmp.get("dateOfSleep").getAsString();
+
+                    List<Data> values = data.get(dateOfSleep);
+                    if(values == null) {
+                        values = new ArrayList<>();
+                        data.put(dateOfSleep, values);
+                    }
+
+                    JsonElement e = tmp.get("minuteData");
+                    if(!e.isJsonNull()) {
+                        JsonArray minuteData = e.getAsJsonArray();
+                        int minuteDataSize = minuteData.size();
+                        for (int k = 0; k < minuteDataSize; k++) {
+                            JsonObject minuteValue = minuteData.get(k).getAsJsonObject();
+
+                            String value = minuteValue.get("value").getAsString();
+                            String dateTime = minuteValue.get("dateTime").getAsString();
+
+                            String timestamp = dateOfSleep + " " + dateTime; // Should be in the form YYYY-MM-DD hh:mm:ss
+
+//                            Log.d(Constants.TAG, "sleep timestamp: " + timestamp);
+
+                            values.add(new Data(timestamp, value, Data.DATA_TYPE_SLEEP));
+                        }
+
+                        data.put(dateOfSleep, values);
+                    }
+                }
+            }
+        }
+
+        // Put all this together and graph it
+        Log.d(Constants.TAG, "starting to graph the values");
+        ArrayList<Entry> co2Entries = new ArrayList<>();
+        ArrayList<Entry> tempEntries = new ArrayList<>();
+        ArrayList<Entry> lightEntries = new ArrayList<>();
+        ArrayList<Entry> sleepEntries = new ArrayList<>();
+
+        ArrayList<String> xVals = new ArrayList<>();
+
+        Set<String> keySet = data.keySet();
+        String[] keys = new String[keySet.size()];
+        keySet.toArray(keys);
+        Arrays.sort(keys);
+
+        int index = 0;
+        int size = keys.length;
+        
+        int n = 1;
+        
+        String[] lastNDays = new String[n];
+        if(size >= 3) {
+            lastNDays = Arrays.copyOfRange(keys, size - (n+1), size - 1);
+        }
+        
+        for(int i = 0; i < n; i++) {
+            List<Data> listOfData = data.get(lastNDays[i]);
+            Collections.sort(listOfData);
+
+            int listSize = listOfData.size();
+            for(int j = 0; j < listSize; j++, index++) {
+                Data data1 = listOfData.get(j);
+
+                Entry entry = new Entry(data1.getValueFloat(), index);
+                Entry blank = new Entry(0, index);
+
+                if(data1.getDataType() == Data.DATA_TYPE_CO2) {
+                    co2Entries.add(entry);
+                    tempEntries.add(blank);
+                    lightEntries.add(blank);
+                    sleepEntries.add(blank);
+                } else if(data1.getDataType() == Data.DATA_TYPE_LIGHT) {
+                    co2Entries.add(blank);
+                    tempEntries.add(blank);
+                    lightEntries.add(entry);
+                    sleepEntries.add(blank);
+                } else if(data1.getDataType() == Data.DATA_TYPE_TEMP) {
+                    co2Entries.add(blank);
+                    tempEntries.add(entry);
+                    lightEntries.add(blank);
+                    sleepEntries.add(blank);
+                } else if(data1.getDataType() == Data.DATA_TYPE_SLEEP) {
+                    co2Entries.add(blank);
+                    tempEntries.add(blank);
+                    lightEntries.add(blank);
+                    sleepEntries.add(entry);
+                }
+
+                xVals.add(data1.getTimestamp().toString());
+            }
+        }
+
+        ArrayList<LineDataSet> dataSets = new ArrayList<>();
+
+        if(co2Entries.size() > 0) {
+            LineDataSet co2DataSet = new LineDataSet(co2Entries, "CO2");
+            co2DataSet.setColor(getResources().getColor(R.color.color_co2));
+            co2DataSet.setCircleColor(getResources().getColor(R.color.color_co2));
+            co2DataSet.setCircleColorHole(getResources().getColor(R.color.color_co2));
+            dataSets.add(co2DataSet);
+        }
+
+        if(lightEntries.size() > 0) {
+            LineDataSet lightDataSet = new LineDataSet(lightEntries, "Light");
+            lightDataSet.setColor(getResources().getColor(R.color.color_light));
+            lightDataSet.setCircleColor(getResources().getColor(R.color.color_light));
+            lightDataSet.setCircleColorHole(getResources().getColor(R.color.color_light));
+            dataSets.add(lightDataSet);
+        }
+
+        if(tempEntries.size() > 0) {
+            LineDataSet tempDataSet = new LineDataSet(tempEntries, "Temperature");
+            tempDataSet.setColor(getResources().getColor(R.color.color_temp));
+            tempDataSet.setCircleColor(getResources().getColor(R.color.color_temp));
+            tempDataSet.setCircleColorHole(getResources().getColor(R.color.color_temp));
+            dataSets.add(tempDataSet);
+        }
+
+        if(sleepEntries.size() > 0) {
+            LineDataSet sleepDataSet = new LineDataSet(sleepEntries, "Sleep");
+            sleepDataSet.setColor(getResources().getColor(R.color.color_sleep));
+            sleepDataSet.setCircleColor(getResources().getColor(R.color.color_sleep));
+            sleepDataSet.setCircleColorHole(getResources().getColor(R.color.color_sleep));
+            sleepDataSet.setAxisDependency(YAxis.AxisDependency.RIGHT);
+            dataSets.add(sleepDataSet);
+        }
+
+        LineData lineData = new LineData(xVals, dataSets);
+        chart.setData(lineData);
+
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.d(Constants.TAG, "invalidating chart and making visible");
+                chart.invalidate();
+
+                chart.setVisibility(View.VISIBLE);
+                progress.setVisibility(View.INVISIBLE);
+                status.setVisibility(View.INVISIBLE);
+            }
+        });
+    }
+
+    /**
      * Pass the ESData as the first parameter and the sleep data as the second
      */
     private class UpdateGraphTask extends AsyncTask<JsonElement, Void, Void> {
@@ -239,133 +459,23 @@ public class StatisticsFragment extends Fragment {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    Log.d(Constants.TAG, "making the progress bar visible");
                     progress.setVisibility(View.VISIBLE);
                 }
             });
 
-            ArrayList<Entry> co2Data = new ArrayList<>();
-            ArrayList<Entry> tempData = new ArrayList<>();
-            ArrayList<Entry> lightData = new ArrayList<>();
-            
-            ArrayList<String> dates = new ArrayList<>();
-            
-            JsonObject esData = params[0].getAsJsonObject();
-            
-            JsonArray result = esData.getAsJsonArray("Result");
-            int size = result.size();
-            if(size > 0) {
-                for(int i = 0; i < size; i++) {
-                    JsonObject datapoint = result.get(i).getAsJsonObject();
-                    
-                    String timestamp = datapoint.get("Timestamp").getAsString();
-                    boolean changed = false;
-                    
-                    //Get the CO2 data if the user wants it
-                    if(co2Toggled) {
-                        if(datapoint.has("CO2Level") && !datapoint.get("CO2Level").isJsonNull()) {
-                            co2Data.add(new Entry(
-                                    Float.valueOf(datapoint.get("CO2Level").getAsString()), 
-                                    i
-                            ));
-                            changed = true;
-                        }
-                    }
-                    
-                    //Get the light data if the user wants it
-                    if(lightToggled) {
-                        if(datapoint.has("Luminance") && !datapoint.get("Luminance").isJsonNull()) {
-                            lightData.add(new Entry(
-                                    Float.valueOf(datapoint.get("Luminance").getAsString()),
-                                    i
-                            ));
-                            changed = true;
-                        }
-                    }
-                    
-                    //Get the temperature data if the user wants it
-                    if(tempToggled) {
-                        if(datapoint.has("Temperature")) {
-                            tempData.add(new Entry(
-                                    Float.valueOf(datapoint.get("Temperature").getAsString()),
-                                    i
-                            ));
-                            changed = true;
-                        }
-                    }
-                    
-                    if(changed) {
-                        dates.add(timestamp);
-                    }
-                }
-            }
-            
-            JsonArray sleepData = params[1].getAsJsonArray();
-            
-            //TODO: create a data set for sleep data and plot on graph
-            int sleepSize = sleepData.size();
-            if(sleepSize > 0) {
-                for(int i=0; i < sleepSize; i++) {
-                    JsonObject dp = sleepData.get(i).getAsJsonObject();
-                    JsonArray sleep = dp.get("sleep").getAsJsonArray();
-                }
-            }
-            
-            ArrayList<LineDataSet> dataSets = new ArrayList<>();
-            
-            LineDataSet co2DataSet;
-            LineDataSet tempDataSet;
-            LineDataSet lightDataSet;
-            
-            if(co2Data.size() > 0) {
-                co2DataSet = new LineDataSet(co2Data, "CO2");
-                co2DataSet.setColor(getResources().getColor(R.color.color_co2));
-                co2DataSet.setCircleColor(getResources().getColor(R.color.color_co2));
-                co2DataSet.setCircleColorHole(getResources().getColor(R.color.color_co2));
-                dataSets.add(co2DataSet);
-            }
-            
-            if(tempData.size() > 0) {
-                tempDataSet = new LineDataSet(tempData, "Temp");
-                tempDataSet.setColor(getResources().getColor(R.color.color_temp));
-                tempDataSet.setCircleColor(getResources().getColor(R.color.color_temp));
-                tempDataSet.setCircleColorHole(getResources().getColor(R.color.color_temp));
-                dataSets.add(tempDataSet);
-            }
-            
-            if(lightData.size() > 0) {
-                lightDataSet = new LineDataSet(lightData, "Light");
-                lightDataSet.setColor(getResources().getColor(R.color.color_light));
-                lightDataSet.setCircleColor(getResources().getColor(R.color.color_light));
-                lightDataSet.setCircleColorHole(getResources().getColor(R.color.color_light));
-                dataSets.add(lightDataSet);
-            }
-
-            LineData data = new LineData(dates, dataSets);
-            
-            chart.setData(data);
-            
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    chart.invalidate();
-                    
-                    status.setVisibility(View.INVISIBLE);
-                    chart.setVisibility(View.VISIBLE);
-                    
-                    progress.setVisibility(View.INVISIBLE);
-                }
-            });
+            parse(params);
             return null;
         }
     }
-    
+
     private class ToggleCheckChangeListener implements CompoundButton.OnCheckedChangeListener {
         @Override
         public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
             int toggleId = compoundButton.getId();
-            
+
             Log.d(Constants.TAG, "Toggling " + compoundButton.getText() + " to " + isChecked);
-            
+
             switch (toggleId) {
                 case R.id.stats_toggle_co2:
                     co2Toggled = isChecked;
@@ -378,10 +488,10 @@ public class StatisticsFragment extends Fragment {
                     break;
                 default:
                     Log.e(Constants.TAG, "Unknown button id: " + toggleId);
-                    
+
                     break;
             }
-            
+
             updateGraph(currentRoomId);
         }
     }
