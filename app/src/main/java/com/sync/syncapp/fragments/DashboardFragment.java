@@ -42,9 +42,9 @@ public class DashboardFragment extends Fragment {
     AccountHandler accountHandler;
 
     TextView sleepDuration, co2Level, light, temperature, humidity;
-    
+
     Spinner roomDropdown;
-    
+
     ArrayList<Room> rooms;
     String currentRoomId = "";
 
@@ -78,18 +78,18 @@ public class DashboardFragment extends Fragment {
 
     public void onStart() {
         super.onStart();
-        
+
         Activity activity = getActivity();
         final Context context = activity.getApplicationContext();
-        
+
         final Account account = new Account(accountHandler.getUserId());
-        
+
         sleepDuration = (TextView) activity.findViewById(R.id.dash_sleep_value);
         co2Level = (TextView) activity.findViewById(R.id.dash_co2_value);
         temperature = (TextView) activity.findViewById(R.id.dash_temp_value);
         humidity = (TextView) activity.findViewById(R.id.dash_humidity_value);
         light = (TextView) activity.findViewById(R.id.dash_light_value);
-        
+
         roomDropdown = (Spinner) activity.findViewById(R.id.dash_room_dropdown);
         roomDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -136,19 +136,8 @@ public class DashboardFragment extends Fragment {
                                 Log.d(Constants.TAG, "populating the dropdown");
                                 ArrayAdapter<Room> adapter = new ArrayAdapter<>(context, R.layout.spinner_item, rooms);
                                 roomDropdown.setAdapter(adapter);
-                                
-                                    String roomName = room.get("RoomType").getAsString();
-                                    String roomId = room.get("id").getAsString();
-                                
-                                    Room newRoom = new Room(account, new Person(account, ""), "", roomName, "");
-                                    newRoom.setId(roomId);
 
-                                    rooms.add(newRoom);
-                                }
 
-                                Log.d(Constants.TAG, "populating the dropdown");
-                                ArrayAdapter<Room> adapter = new ArrayAdapter<>(context, R.layout.spinner_item, rooms);
-                                roomDropdown.setAdapter(adapter);
                             } else {
                                 rooms = new ArrayList<>();
                                 Room noRoom = new Room();
@@ -162,7 +151,7 @@ public class DashboardFragment extends Fragment {
                     }
                 });
     }
-    
+
     public void updateDashboard() {
         if(currentRoomId.equals("")) {
             String noData = "No data received";
@@ -180,30 +169,39 @@ public class DashboardFragment extends Fragment {
                     .setCallback(new FutureCallback<JsonObject>() {
                         @Override
                         public void onCompleted(Exception e, JsonObject array) {
-                            if(e != null) {
+                            if (e != null) {
                                 Log.e(Constants.TAG, "error fetching es data in Dashboard", e);
                                 return;
                             }
-                            if(array != null) {
+                            if (array != null) {
                                 JsonArray result = array.get("Result").getAsJsonArray();
                                 int size = result.size();
                                 if (size > 0) {
                                     JsonObject object = result.get(size - 1).getAsJsonObject();
 
-                                    if(!object.get("Temperature").isJsonNull()) {
+                                    if (!object.get("Temperature").isJsonNull()) {
                                         temperature.setText(object.get("Temperature").getAsString() + " F");
                                     }
 
-                                    if(!object.get("Humidity").isJsonNull()) {
+                                    if (!object.get("Humidity").isJsonNull()) {
                                         humidity.setText(object.get("Humidity").getAsString() + "%");
                                     }
 
-                                    if(!object.get("Luminance").isJsonNull()) {
+                                    if (!object.get("Luminance").isJsonNull()) {
                                         light.setText(object.get("Luminance").getAsString() + " lux");
                                     }
 
-//                            sleepDuration.setText(summary.get("totalTimeInBed").getAsString());
-//                            co2Level.setText(esData.get("CO2Level").getAsString() + " ppm");
+                                    int j = size - 1;
+                                    while (j >= 0 && !result.get(j).isJsonNull()) {
+                                        JsonObject co2 = result.get(j).getAsJsonObject();
+
+                                        if (!co2.get("CO2Level").isJsonNull()) {
+                                            co2Level.setText(co2.get("CO2Level").getAsString());
+                                            break;
+                                        } else {
+                                            j -= 1;
+                                        }
+                                    }
 
                                 } else {
                                     String noData = "No data received";
