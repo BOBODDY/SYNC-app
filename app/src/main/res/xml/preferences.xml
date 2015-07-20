@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     
-    <Preference android:title="@string/add_person">
-        <intent android:action=".activities.AddPersonActivity" />
+    <Preference android:title="@string/people">
+        <intent android:action=".activities.PeopleActivity" />
     </Preference>
     
-    <Preference android:title="@string/add_room">
-        <intent android:action=".activities.AddRoomActivity" />
+    <Preference android:title="@string/rooms">
+        <intent android:action=".activities.RoomsActivity" />
     </Preference>
     
     <Preference android:title="@string/add_esensor">

@@ -30,6 +30,7 @@
 
         <!-- AddUserActivity -->
 
+
         <!-- Auth0 Lock -->
         <activity
             android:name="com.auth0.lock.LockActivity"
@@ -66,7 +67,7 @@
         <activity
             android:name=".activities.AddRoomActivity"
             android:label="@string/title_activity_add_room"
-            android:parentActivityName=".activities.MainActivity">
+            android:parentActivityName=".activities.MainActivity" >
             <intent-filter>
                 <action android:name=".activities.AddRoomActivity" />
 
@@ -78,11 +79,11 @@
         <activity
             android:name=".activities.AddFitbitActivity"
             android:label="@string/title_activity_add_sensor"
-            android:parentActivityName=".activities.MainActivity">
-
+            android:parentActivityName=".activities.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.sync.syncapp.activities.MainActivity" />
+
             <intent-filter>
                 <action android:name=".activities.AddFitbitActivity" />
 
@@ -117,6 +118,38 @@
 
             <intent-filter>
                 <action android:name=".activities.AddESensorActivity" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <!-- PeopleActivity -->
+        <activity
+            android:name=".activities.PeopleActivity"
+            android:label="@string/title_activity_people"
+            android:parentActivityName=".activities.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.sync.syncapp.activities.MainActivity" />
+
+            <intent-filter>
+                <action android:name=".activities.PeopleActivity" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        
+        <!-- RoomsActivity -->
+        <activity
+            android:name=".activities.RoomsActivity"
+            android:label="@string/title_activity_rooms"
+            android:parentActivityName=".activities.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.sync.syncapp.activities.MainActivity" />
+
+            <intent-filter>
+                <action android:name=".activities.RoomsActivity" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>

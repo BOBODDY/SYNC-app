@@ -60,10 +60,20 @@
     <string name="toggle_co2">CO2</string>
     <string name="toggle_temp">Temp</string>
     <string name="toggle_light">Light</string>
+    
+    <!-- People strings -->
+    <string name="people">People</string>
+    <string name="peopleAccount">People on your account</string>
+    
+    <!-- Rooms strings -->
+    <string name="rooms">Rooms</string>
+    <string name="roomsAccount">Rooms on your account</string>
 
     <string name="title_activity_add_user">Add User</string>
     <string name="title_activity_add_room">Add Room</string>
     <string name="title_activity_add_sensor">Add Sensor</string>
     <string name="title_activity_add_person">Add Person</string>
     <string name="title_activity_add_esensor">Add Environmental Sensor</string>
+    <string name="title_activity_people">People</string>
+    <string name="title_activity_rooms">RoomsActivity</string>
 </resources>

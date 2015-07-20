@@ -33,30 +33,6 @@
             android:inputType="text"/>
     </LinearLayout>
 
-    <!--<LinearLayout-->
-        <!--android:id="@+id/add_person_room_layout"-->
-        <!--android:layout_width="fill_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_marginTop="25dp"-->
-        <!--android:layout_below="@id/add_person_name_layout">-->
-
-        <!--<TextView-->
-            <!--android:id="@+id/add_person_room_title"-->
-            <!--android:text="@string/person_room"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"/>-->
-
-        <!--&lt;!&ndash;<EditText&ndash;&gt;-->
-            <!--&lt;!&ndash;android:id="@+id/add_person_name"&ndash;&gt;-->
-            <!--&lt;!&ndash;android:layout_width="fill_parent"&ndash;&gt;-->
-            <!--&lt;!&ndash;android:layout_height="wrap_content"&ndash;&gt;-->
-            <!--&lt;!&ndash;android:inputType="text"/>&ndash;&gt;-->
-        <!--<Spinner-->
-            <!--android:id="@+id/add_person_room"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content" />-->
-    <!--</LinearLayout>-->
-
     <Button
         android:id="@+id/add_person_done"
         android:layout_width="wrap_content"
