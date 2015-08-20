@@ -5,6 +5,7 @@ import android.app.Fragment;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.ArrayMap;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -261,7 +262,7 @@ public class StatisticsFragment extends Fragment {
      * @param params JsonElements for esData and sleep data, in that order
      */
     protected void parse(JsonElement... params) {
-        HashMap<String, List<Data>> data = new HashMap<>();
+        ArrayMap<String, List<Data>> data = new ArrayMap<>();
 
         //Parse the environmental data
         Log.d(Constants.TAG, "starting to parse the environmental data");
